@@ -6,6 +6,10 @@
   The options for loading are: Merge. Append, Truncate & Load, Recreate table and Load
   The load is based on the column header of the file so order doesn't matter.
   It can be run on a directory of files or a single file
+  
+  Versions
+  1.1.0 - Initial release
+  1.1.1 - Added new Timestamp conversion type for Ryan T. WHEN DATE_STR RLIKE '\\d{8}\\s\\d{6}.\\d{3}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'YYYYMMDD HH24MISS.FF'),'YYYY-MM-DD HH24:MI:SS.FF') 
 */
 
 
@@ -20,7 +24,7 @@ create or replace procedure get_stored_proc_version_number ()
 // Update the second digit if it breaks workbooks previously available
 // 3rd digit is minor release and does not cause the need to upgrade
 $$
-return "1.1.0";
+return "2.1.1";
 $$;
 --**************************  create_table_from_file_and_load  **************************
 
@@ -126,6 +130,7 @@ var emptyFile = true;
 var columnName =" ";
 var TableCols = "";
 var FileCols = "";
+var FileColsNotConverted = "";
 var stmt="";
 var fileAlias = "fileSource";
 var tableAlias ="t";
@@ -139,10 +144,10 @@ var justTABLE_NAME = TABLE_NAME;
 var uploadStmt="";
 var newLine = "\r\n";
 var columnDelimiter ='~';
-var numOfBatchColumns=501;
+var numOfBatchColumns=1001;
 var dollar = '$';
 
-var arrDataTypes = ["STRING", "VARCHAR","INTEGER", "NUMBER","DOUBLE", "TIMESTAMP", "DATE","FLOAT","VARIANT","ARRAY","BOOLEAN","OBJECT","TIME"];
+var arrDataTypes = ["TEXT", "STRING", "VARCHAR","INTEGER", "NUMBER","DOUBLE", "TIMESTAMP", "DATE","FLOAT","VARIANT","ARRAY","BOOLEAN","OBJECT","TIME"];
 var bIsDatatypeSupplied = false
 var dataTypeFromFile = "";
 var firstColumnFromFirstowFromFile = ""
@@ -201,6 +206,7 @@ try{
           arrayColunmNamesFromFile = arrayFirstRow;
           columnName = firstColumnFromFirstowFromFile;
       }
+
 
    //debugging return "bIsDatatypeSupplied = " + bIsDatatypeSupplied + " Colname = "+columnName + " DataType = " + dataTypeFromFile
   
@@ -300,16 +306,17 @@ try{
         }
         emptyFile = false;
         ordinalForSelect = ordinal + 1; // have to do this becuase the arrays start at 0 but the columns start at 1
-        if (dataType=="DATE"){
-            FileCols += ",convert_date($" + ordinalForSelect+")";
+        FileColsNotConverted += ",$" + ordinalForSelect;
+        if (dataType=="DATE"){            
+            FileCols += ",convert_to_date($" + ordinalForSelect+")";
         }
         else{
           if (dataType.substring(0,9) == "TIMESTAMP"){
-              FileCols += ",convert_datetime($" + ordinalForSelect+")";
+              FileCols += ",convert_to_datetime($" + ordinalForSelect+")";
           } 
           else{
-              if (dataType.substring(0,4)=="TIME Not Needed because time is converted automatically!!"){
-                  FileCols += ",convert_time($" + ordinalForSelect+")";
+              if (dataType.substring(0,4)=="TIME"){
+                  FileCols += ",convert_to_time($" + ordinalForSelect+")";
               }
               else{
                    FileCols += ",$" + ordinalForSelect;  
@@ -349,6 +356,7 @@ try{
     else{
       TableCols = TableCols.substring(1); //Remove leading comma
       FileCols = FileCols.substring(1); //Remove leading comma
+      FileColsNotConverted = FileColsNotConverted.substring(1); //Remove leading comma
       if(COPY_TYPE=='MERGE')
       {
           matchByClause = matchByClause.substring(5); // Remove the leading " and "
@@ -359,7 +367,7 @@ try{
           if (updateClause!=""){
               uploadStmt += `WHEN MATCHED AND NOT(${matchByClauseIfChanged}) THEN UPDATE SET ${updateClause} `
           }
-          uploadStmt += `WHEN NOT MATCHED THEN INSERT (${TableCols}) VALUES (${FileCols});`     
+          uploadStmt += `WHEN NOT MATCHED THEN INSERT (${TableCols}) VALUES (${FileColsNotConverted});`     
        }
        else
        {
@@ -439,19 +447,19 @@ catch(err)
   stmt.next();
   var length = stmt.getColumnValue(1);
   if(length>12) //check to see if it's a DateTime
-  {
-  try{
-      snowflake.execute({ sqlText: "select cast(convert_datetime($" + ORDINAL + ") as datetime) from "+STAGE+";"});
-      return "TIMESTAMP";
-      }
-      catch(err)
-  {
-  found = false;
+    {
+    try{
+        snowflake.execute({ sqlText: "select convert_to_datetime($" + ORDINAL + ") from "+STAGE+";"});
+        return "TIMESTAMP";
+        }
+        catch(err)
+    {
+    found = false;
+    }
   }
-}
 //check if it's a Date
 try{
-    snowflake.execute({ sqlText: "select cast(convert_date($" + ORDINAL + ") as date) from "+STAGE+";"});
+    snowflake.execute({ sqlText: "select convert_to_date($" + ORDINAL + ") from "+STAGE+";"});
     return "DATE";
 }
 catch(err)
@@ -460,7 +468,7 @@ found = false;
 }
 //Check if it's a Time
 try{
-    snowflake.execute({ sqlText: "select cast($" + ORDINAL + " as time) from "+STAGE+";"});
+    snowflake.execute({ sqlText: "select convert_to_time($" + ORDINAL + ") from "+STAGE+";"});
     return "TIME";
 }
 catch(err)
@@ -481,71 +489,72 @@ catch(err)
   return datatype;
 $$;
 
---**************************  convert_date  **************************
+--**************************  convert_to_date  **************************
 
-create or replace function convert_date(DATE_STR string)
-  returns string
+create or replace function convert_to_date(DATE_STR string)
+  returns date
   language sql
   as
 $$
 select CASE 
-         WHEN DATE_STR RLIKE '\\d{4}-\\d{2}-\\d{2}' THEN TO_VARCHAR(TO_DATE(DATE_STR, 'YYYY-MM-DD'),'YYYY-MM-DD')
-         WHEN DATE_STR RLIKE '\\d{4}/\\d{2}/\\d{2}' THEN TO_VARCHAR(TO_DATE(DATE_STR, 'YYYY/MM/DD'),'YYYY-MM-DD')
-         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{2}' THEN TO_VARCHAR(TO_DATE(DATE_STR, 'MM/DD/YY'),'YYYY-MM-DD')
-         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{4}' THEN TO_VARCHAR(TO_DATE(DATE_STR, 'MM/DD/YYYY'),'YYYY-MM-DD')
-         WHEN DATE_STR RLIKE '\\w+\\s\\d{1,2},\\s\\d{4}' THEN TO_VARCHAR(TO_DATE(DATE_STR, 'MON DD, YYYY'),'YYYY-MM-DD')
-         WHEN DATE_STR RLIKE '\\d{1,2}-\\w+-\\d{4}' THEN TO_VARCHAR(TO_DATE(DATE_STR, 'DD-MON-YYYY'),'YYYY-MM-DD')       
-         WHEN DATE_STR RLIKE '\\d{1,2}-\\w+-\\d{2}' THEN TO_VARCHAR(TO_DATE(DATE_STR, 'DD-MON-YY'),'YYYY-MM-DD')
-         WHEN DATE_STR RLIKE '\\d{2}/\\d{6}' THEN TO_VARCHAR(TO_DATE(DATE_STR, 'MM/DDYYYY'),'YYYY-MM-DD')
-         WHEN DATE_STR RLIKE '\\d{8}' THEN TO_VARCHAR(TO_DATE(DATE_STR, 'YYYYMMDD'),'YYYY-MM-DD') 
+         WHEN DATE_STR RLIKE '\\d{4}-\\d{2}-\\d{2}' THEN TO_DATE(DATE_STR, 'YYYY-MM-DD')
+         WHEN DATE_STR RLIKE '\\d{4}/\\d{2}/\\d{2}' THEN TO_DATE(DATE_STR, 'YYYY/MM/DD')
+         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{2}' THEN TO_DATE(DATE_STR, 'MM/DD/YY')
+         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{4}' THEN TO_DATE(DATE_STR, 'MM/DD/YYYY')
+         WHEN DATE_STR RLIKE '\\w+\\s\\d{1,2},\\s\\d{4}' THEN TO_DATE(DATE_STR, 'MON DD, YYYY')
+         WHEN DATE_STR RLIKE '\\d{1,2}-\\w+-\\d{4}' THEN TO_DATE(DATE_STR, 'DD-MON-YYYY')     
+         WHEN DATE_STR RLIKE '\\d{1,2}-\\w+-\\d{2}' THEN TO_DATE(DATE_STR, 'DD-MON-YY')
+         WHEN DATE_STR RLIKE '\\d{2}/\\d{6}' THEN TO_DATE(DATE_STR, 'MM/DDYYYY')
+         WHEN DATE_STR RLIKE '\\d{8}' THEN TO_DATE(DATE_STR, 'YYYYMMDD') 
          ELSE  DATE_STR
        END AS DATE_STR_TO_DATE
 $$;
 
---**************************  convert_datetime  **************************
+--**************************  convert_to_datetime  **************************
 
-create or replace function convert_datetime(DATE_STR string)
-  returns string
+create or replace function convert_to_datetime(DATE_STR string)
+  returns timestamp
   language sql
   as
 $$
 select CASE 
          //Timestamp down to the Second
-         WHEN DATE_STR RLIKE '\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'YYYY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')
-         WHEN DATE_STR RLIKE '\\d{4}/\\d{2}/\\d{2}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'YYYY/MM/DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')
-         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'MM/DD/YYYY HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')
-         WHEN DATE_STR RLIKE '\\d{1,2}-\\d{1,2}-\\d{4}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'MM-DD-YYYY HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') 
+         WHEN DATE_STR RLIKE '\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'YYYY-MM-DD HH24:MI:SS')
+         WHEN DATE_STR RLIKE '\\d{4}/\\d{2}/\\d{2}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'YYYY/MM/DD HH24:MI:SS')
+         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'MM/DD/YYYY HH24:MI:SS')
+         WHEN DATE_STR RLIKE '\\d{1,2}-\\d{1,2}-\\d{4}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'MM-DD-YYYY HH24:MI:SS')
           //Timestamp down to the Second and 2 digit year
-         WHEN DATE_STR RLIKE '\\d{2}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'YY-MM-DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')
-         WHEN DATE_STR RLIKE '\\d{2}/\\d{2}/\\d{2}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'YY/MM/DD HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS')
-         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{2}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'MM/DD/YY HH24:MI:SS'),'YYYY-MM-DD HH24:MI:SS') 
+         WHEN DATE_STR RLIKE '\\d{2}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'YY-MM-DD HH24:MI:SS')
+         WHEN DATE_STR RLIKE '\\d{2}/\\d{2}/\\d{2}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'YY/MM/DD HH24:MI:SS')
+         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{2}\\s\\d{2}:\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'MM/DD/YY HH24:MI:SS') 
          //Timestamp down to the Minute
-         WHEN DATE_STR RLIKE '\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'YYYY-MM-DD HH24:MI'),'YYYY-MM-DD HH24:MI:SS')
-         WHEN DATE_STR RLIKE '\\d{4}/\\d{2}/\\d{2}\\s\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'YYYY/MM/DD HH24:MI'),'YYYY-MM-DD HH24:MI:SS')
-         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'MM/DD/YYYY HH24:MI'),'YYYY-MM-DD HH24:MI') 
+         WHEN DATE_STR RLIKE '\\d{4}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'YYYY-MM-DD HH24:MI')
+         WHEN DATE_STR RLIKE '\\d{4}/\\d{2}/\\d{2}\\s\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'YYYY/MM/DD HH24:MI')
+         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'MM/DD/YYYY HH24:MI')
          //Timestamp down to the Minute and 2 digit year
-         WHEN DATE_STR RLIKE '\\d{2}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'YY-MM-DD HH24:MI'),'YYYY-MM-DD HH24:MI:SS')
-         WHEN DATE_STR RLIKE '\\d{2}/\\d{2}/\\d{2}\\s\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'YY/MM/DD HH24:MI'),'YYYY-MM-DD HH24:MI:SS')
-         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{2}\\s\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'MM/DD/YY HH24:MI'),'YYYY-MM-DD HH24:MI') 
+         WHEN DATE_STR RLIKE '\\d{2}-\\d{2}-\\d{2}\\s\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'YY-MM-DD HH24:MI')
+         WHEN DATE_STR RLIKE '\\d{2}/\\d{2}/\\d{2}\\s\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'YY/MM/DD HH24:MI')
+         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{2}\\s\\d{2}:\\d{2}' THEN TO_TIMESTAMP(DATE_STR, 'MM/DD/YY HH24:MI')
          //HH12
-         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{2}\\s\\d{1,2}:\\d{1,2}\\s\\w{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'MM/DD/YY HH12:MI AM'),'YYYY-MM-DD HH24:MI') 
-         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{1,2}:\\d{1,2}\\s\\w{2}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'MM/DD/YYYY HH12:MI:SS AM'),'YYYY-MM-DD HH24:MI:SS')  
+         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{2}\\s\\d{1,2}:\\d{1,2}\\s\\w{2}' THEN TO_TIMESTAMP(DATE_STR, 'MM/DD/YY HH12:MI AM')
+         WHEN DATE_STR RLIKE '\\d{1,2}/\\d{1,2}/\\d{4}\\s\\d{1,2}:\\d{1,2}:\\d{1,2}\\s\\w{2}' THEN TO_TIMESTAMP(DATE_STR, 'MM/DD/YYYY HH12:MI:SS AM') 
+         //Special Case example - '20200809 042319.000'
+         WHEN DATE_STR RLIKE '\\d{8}\\s\\d{6}.\\d{3}' THEN TO_TIMESTAMP(DATE_STR, 'YYYYMMDD HH24MISS.FF')
          ELSE DATE_STR
        END AS DATE_STR_TO_DATE
 $$;
+--**************************  convert_to_time  **************************
 
---**************************  convert_time  **************************
-
-create or replace function convert_time(DATE_STR string)
-  returns string
+create or replace function convert_to_time(DATE_STR string)
+  returns time
   language sql
   as
 $$
 select CASE 
-          WHEN DATE_STR RLIKE '\\d{1,2}:\\d{2}:\\d{2}' THEN TO_VARCHAR(TO_TIME(DATE_STR, 'HH24:MI:SS'),'HH24:MI:SS')
-          WHEN DATE_STR RLIKE '\\d{1,2}:\\d{2}:\\d{2}\\s\\w{2}' THEN TO_VARCHAR(TO_TIME(DATE_STR, 'HH12:MI:SS AM'),'HH24:MI:SS')
-          WHEN DATE_STR RLIKE '\\d{1,2}:\\d{2}' THEN TO_VARCHAR(TO_TIME(DATE_STR, 'HH24:MI'),'HH24:MI:SS')
-          WHEN DATE_STR RLIKE '\\d{1,2}:\\d{2}\\s\\w{2}' THEN TO_VARCHAR(TO_TIME(DATE_STR, 'HH12:MI AM'),'HH24:MI:SS') 
+          WHEN DATE_STR RLIKE '\\d{1,2}:\\d{2}:\\d{2}' THEN TO_TIME(DATE_STR, 'HH24:MI:SS')
+          WHEN DATE_STR RLIKE '\\d{1,2}:\\d{2}:\\d{2}\\s\\w{2}' THEN TO_TIME(DATE_STR, 'HH12:MI:SS AM')
+          WHEN DATE_STR RLIKE '\\d{1,2}:\\d{2}' THEN TO_TIME(DATE_STR, 'HH24:MI')
+          WHEN DATE_STR RLIKE '\\d{1,2}:\\d{2}\\s\\w{2}' THEN TO_TIME(DATE_STR, 'HH12:MI AM')
           ELSE DATE_STR
        END AS DATE_STR_TO_DATE
 $$;
