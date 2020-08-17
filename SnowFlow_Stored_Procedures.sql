@@ -10,6 +10,7 @@
   Versions
   1.1.0 - Initial release
   1.1.1 - Added new Timestamp conversion type for Ryan T. WHEN DATE_STR RLIKE '\\d{8}\\s\\d{6}.\\d{3}' THEN TO_VARCHAR(TO_TIMESTAMP(DATE_STR, 'YYYYMMDD HH24MISS.FF'),'YYYY-MM-DD HH24:MI:SS.FF') 
+  2.1.2 - Bug fix - issue when data types are provided but one is missing. Needed to set skip header = 2
 */
 
 
@@ -19,12 +20,12 @@ create or replace procedure get_stored_proc_version_number ()
   language javascript strict
   execute as caller
   as
-// Workbook has to be less than the first digit and greater than the second
+// Workbook has to be less than or equal to the first digit and greater than or equal to the second
 // Update the first digit for new features that new workbooks rely on
 // Update the second digit if it breaks workbooks previously available
 // 3rd digit is minor release and does not cause the need to upgrade
 $$
-return "2.1.1";
+return "2.1.2";
 $$;
 --**************************  create_table_from_file_and_load  **************************
 
@@ -164,34 +165,41 @@ try{
   if(!TABLE_NAME || !STAGE || !PATH ||!COPY_TYPE){
     return `Error: At least one paramter is null: merge_file_into_table (TABLE_NAME=${TABLE_NAME}, STAGE=${STAGE}, PATH=${PATH}, COPY_TYPE=${COPY_TYPE})`
   }
-  COPY_TYPE = COPY_TYPE.toUpperCase();
-    //Create table First if needed
+      COPY_TYPE = COPY_TYPE.toUpperCase();
       snowflake.execute({ sqlText: alterStageHeader0}); // We are first retreiving headers
-      // Create the select statemnt: select concat($1,',',$2) ...
+//First get the headers from the file
+//Figure out how many columns to get from the file
       var i;      
       if(NUMBER_OF_COLUMNS>-1){
         numOfBatchColumns=NUMBER_OF_COLUMNS;
       }
+      else
+      {
+        // Since we don't know how many columns in the file, I'm getting an estimate by pulling some columns and finding the first one that is null
+        sqlStmt = `select iff($100 is null,'100',iff($300 is null,'300',iff($600 is null,'600',iff($900 is null,'900',iff($1200 is null,'1200',iff($1500 is null,'15000','')))))) from ${stageFullPath}  limit 1 offset 0`;
+        var stmtGetFirstRow = snowflake.execute({ sqlText: sqlStmt});      
+        stmtGetFirstRow.next();      
+        numOfBatchColumns = stmtGetFirstRow.getColumnValue(1);          
+      }
+// Create the select statemnt: select concat($1,',',$2) ...      
       selectStmt="";
       for (i = 1; i <= numOfBatchColumns; i++) {
           selectStmt+=",'"+columnDelimiter+"',IfNULL($"+i+",'')";
       }
-      //Get first row in file and detect if it is a datatype or a column
+//Get create SQL and execute to get Col name - select ($1,$2,.. from filename limit 1)
       sqlStmt = `select concat(${selectStmt.substring(5)}) from ${stageFullPath} limit 1;`;
       var stmtGetFirstRow = snowflake.execute({ sqlText: sqlStmt});
       stmtGetFirstRow.next();
       var val = stmtGetFirstRow.getColumnValue(1);
       var arrayFirstRow = val.split(columnDelimiter);
 
-    // Debugging: return arrayFirstRow[0]+"  "+arrayFirstRow[1]+"  "+arrayFirstRow[2]
-
       firstColumnFromFirstowFromFile = arrayFirstRow[0].toUpperCase();
-        // Check to see if the first col is a datatype. If not then its' the column headers
+// Check to see if the first col is a datatype. If not then its' the column headers
       if (firstColumnFromFirstowFromFile.includes("(") || arrDataTypes.includes(firstColumnFromFirstowFromFile) || firstColumnFromFirstowFromFile=="" ) {
           bIsDatatypeSupplied = true;
           dataTypeFromFile = firstColumnFromFirstowFromFile;
           arrayDataTypesFromFile = arrayFirstRow; 
-          // If the data type is supplied then get the next row which are the headers
+// Since the data type is supplied then get the next row which are the headers
           var stmtColumnNamesFromFile = snowflake.execute({ sqlText: `select concat(${selectStmt.substring(5)}) from ${stageFullPath} limit 1 offset 1;`});
           stmtColumnNamesFromFile.next();
           val = stmtColumnNamesFromFile.getColumnValue(1);
@@ -207,12 +215,15 @@ try{
           columnName = firstColumnFromFirstowFromFile;
       }
 
-
-   //debugging return "bIsDatatypeSupplied = " + bIsDatatypeSupplied + " Colname = "+columnName + " DataType = " + dataTypeFromFile
-  
   if(COPY_TYPE == "RECREATETABLE" || COPY_TYPE == "CREATETABLEONLY"){
-        
-      snowflake.execute({ sqlText: alterStageHeader1});  
+// Get data types for each column 
+       if (bIsDatatypeSupplied) {
+            sql = alterStageHeader2      
+       }
+       else{
+            sql = alterStageHeader1       
+       }       
+      snowflake.execute({ sqlText: sql});  
       while (columnName)
       {    
         //If the column name is null then we are done
@@ -366,6 +377,7 @@ try{
           uploadStmt = `merge into ${TABLE_NAME} ${tableAlias} using (select ${FileCols} from ${stageFullPath}) as ${fileAlias} on ${matchByClause} `
           if (updateClause!=""){
               uploadStmt += `WHEN MATCHED AND NOT(${matchByClauseIfChanged}) THEN UPDATE SET ${updateClause} `
+             // uploadStmt += `WHEN MATCHED  THEN UPDATE SET ${updateClause} `
           }
           uploadStmt += `WHEN NOT MATCHED THEN INSERT (${TableCols}) VALUES (${FileColsNotConverted});`     
        }
