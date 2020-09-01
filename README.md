@@ -77,7 +77,7 @@ Developer" tab within Excel's menu.  You can add it by right-clicking on the too
 
 * Select the directory the `SnowflakeAddin.xlam` was saved to.  Make sure to check the plugin before selecting OK.
 
-![](images/image3.png)
+<img src="images/image3.png" width=50% >
 
 ## Using SnowFlow
 
@@ -117,7 +117,7 @@ Another important option is defining the columns that will represent the keys in
 
 If you decide the current structure is incorrect and want to just recreate and load the data, you can do so by truncating all the data.
 
-![](images/image8.png)
+<img src="images/image8.png" width=50% >
 
 When you add a new table or column to the sheet, the last checkbox starting with "Auto-generate" will allow the system to automatically create the column data types.  
 However, there may be times where you want to explicitly define the data types within the Excel sheet before uploading the data. Press the “Define data type” button in the Excel Ribbon and a data type selector will appear above the column header.
