@@ -12,6 +12,14 @@ Example use-cases include:
 |:---------------------------|
 |Excelerator is not a supported product by Snowflake or any company. Excelerator will write data to the Snowflake database and should be used with great care. Use at your own risk. |
 
+## Get Started with Excelerator
+
+To get started, you'll need to:
+
+1. Install the plugin in Excel (below)
+2. [Connect your Snowflake account](#use-excelerator)
+3. Then you can [query Snowflake](#execute-a-query) and optionally [write data back](#write-data-to-snowflake)
+
 ## Install Excelerator
 
 To begin, clone or download this repository to get your own copy of all the files.
