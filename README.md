@@ -1,6 +1,6 @@
-# Welcome to SnowFlow
+# Excelerator: Use Snowflake in Excel
 
-Snowflow gives organizations the ability to flow data in and out of Snowflake using Excel.
+Excelerator is an Excel plugin to help you flow data in and out of Snowflake using Excel.
 
 Example use-cases include:
 * financial budgeting write-back,
@@ -10,20 +10,19 @@ Example use-cases include:
 
 | :memo: LEGAL              |
 |:---------------------------|
-|SnowFlow is not a supported product by Snowflake or any company. SnowFlow will write data to the Snowflake database and should be used with great care. Use at your own risk. |
+|Excelerator is not a supported product by Snowflake or any company. Excelerator will write data to the Snowflake database and should be used with great care. Use at your own risk. |
 
-## Setup
+## Install Excelerator
 
-### Step 0
-Clone this repository!
+To begin, clone or download this repository to get your own copy of all the files.
     
-### Step 1 (optional) - Create Stored Procedures in Snowflake
+### Step 1 (optional): Create Stored Procedures in Snowflake
 
 This step is only needed to enable the ‘Data Type Auto-generation’ feature when adding a new table or column. Without the stored procedures, you'll have to define the data types for each new column.
 
 If you have access to the Snowflake web interface and a role with elevated privileges such as "ACCOUNTADMIN", you can run `SnowFlow_Stored_Procedures.sql`.  If you don't have access, then contact your Snowflake DBA and have them run the script for you.  This script will need to be run in the same database that you login into with the Excel Addin, which we discuss below.
 
-### Step 2 – Privileges Required
+### Step 2: Set Required Privileges
 
 Below are the privileges required for each capability.
 
@@ -34,7 +33,7 @@ To **query** data:
 | Schema     | USAGE, CREATE STAGE* |
 | Table      | SELECT               |
 
-*Stage can be provided in the login instead
+\*Stage can be provided in the login instead
 
 To **upload** data requires everything in query, plus:
 
@@ -63,44 +62,46 @@ One approach for handling these privileges is to create a new role with the abov
 
 You’ll have to update the script before executing it with the information specific to your environment. In the script, you will be providing the parent role. Then you'll use the parent role when logging in.
 
-### Step 3 – Install Excel Addin
+### Step 3 – Install Excel Add-in
 
-* Install the SnowFlow Addin
-* Make sure you have access to the
-Developer" tab within Excel's menu.  You can add it by right-clicking on the toolbar, selecting “customize the ribbon", and then clicking its checkbox.
+In order to install the plugin, which Excel calls "add-ins," make sure you have access to the "Developer" tab within Excel's menu.  You can add it by right-clicking on the toolbar, selecting “customize the ribbon", and then clicking its checkbox.
 
 ![](images/image1.png)
 
-* Select Excel Add-Ins:
+Now select Excel Add-Ins:
 
 ![](images/image2.png)
 
-* Select the directory the `SnowflakeAddin.xlam` was saved to.  Make sure to check the plugin before selecting OK.
+Navigate to the directory where the `.xlam` file was saved.  Make sure to check the plugin before selecting OK.
 
 <img src="images/image3.png" width=50% >
 
-## Using SnowFlow
+At this point, Excelerator is available within Excel. You'll see a UI within the "Home" tab.
 
-### Connection Parameters
-You should now see a new Snowflake menu section within the "Home" tab
+## Use Excelerator
+
+With Excelerator installed, now you need to connect it to Snowflake. 
 
 ![](images/image4.png)
 
-Select the `connect` button and enter the Snowflake connection information.  There are two security types standard: login/password and SSO.  We recommend using SSO for more secure authentication.
+First, confirm you can find the appropriate buttons within the "Home" tab.
+
+### Connection Parameters
+
+Click the `connect` button and enter your Snowflake connection information.  There are two security types standard: login/password and SSO.  We recommend using SSO for more secure authentication.
+
+![](images/image5.png)
 
 In the `Role` field, add the role that you entered into the script in Step 3.
 
 | :exclamation:        | The login database and schema specified in the connection must be the same database and schema the Stored Procs were run under     |
 |---------------|:------------------------|
 
-![](images/image5.png)
+### Execute a Query
 
-#### Executing a query
+Now we'll walk you through each section of the plugin. You can work with data sourced from other data sources within Excel (such as files) or you can pull data from Snowflake into Excel.  You can manipulate the data using VBA scripts and vlookups, but be sure to write that final data is sent back to Snowflake! The plugin handles both reading and writing scenarios.
 
-Now we'll walk you through each section of the plugin. You can work with data sourced from other data sources within Excel (such as files) or you can pull data from Snowflake into Excel.  You can manipulate the data using VBA scripts and vlookups but be sure to write that final data set back to Snowflake!  SnowFlow handles both reading and writing scenarios.
-
-* Pull data into excel by select the “Query button”
-* Enter your query
+Pull data into Excel by selecting the “Query button” and typing in the query.
 
 ![](images/image6.png)
 
@@ -108,7 +109,10 @@ You'll get results that look similar to this:
 
 ![](images/image7.png)
 
-### Writing Data to Snowflake
+Repeat as-needed to gather data from Snowflake into your Excel sheet.
+
+### Write Data to Snowflake
+
 Once the data is returned you can update or insert rows and columns within Excel.
 
 To propagate those changes to Snowflake press the “Upload” button.  Here you can enter the worksheet the data is being sourced from and define the table the data is being written to.
