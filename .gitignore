@@ -4,4 +4,3 @@ Excel_Snowflake_Integration_Master.xlsm
 *.xlsm
 Test-xlam/desktop.ini
 Test-xlam/SnowFlowExcelAddin.xlam
-src/NamedRanges.csv
