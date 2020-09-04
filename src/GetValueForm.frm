@@ -13,7 +13,13 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
-
+Private Sub UserForm_Activate()
+    tbValue.SetFocus
+    With tbValue
+        .SelStart = 0
+        .SelLength = Len(.Text)
+    End With
+End Sub
 
 Private Sub btOK_Click()
     Me.Hide
