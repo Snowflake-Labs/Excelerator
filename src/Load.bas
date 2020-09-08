@@ -62,7 +62,9 @@ Sub uploadData(copyType As String, inTableName As String, inMergeKeys As String)
     firstCellValue = dataWorksheet.Cells(giStartingRowForUpload, 1).value
     ' Check if first row has the data types.
     iHeaderRow = giStartingRowForUpload
-    If Application.WorksheetFunction.CountIf(CustomRange(sgRangeDataTypes), firstCellValue) > 0 Or firstCellValue = "" Or InStr(firstCellValue, "(") Then
+    Dim arrDatatypes() As String
+    arrDatatypes = Split(sgDatatypes, ",")
+    If IsInArray(firstCellValue, arrDatatypes) Or firstCellValue = "" Or InStr(firstCellValue, "(") Then
         iHeaderRow = iHeaderRow + 1
         bDataTypeRowExists = True
     End If
@@ -84,7 +86,7 @@ Sub uploadData(copyType As String, inTableName As String, inMergeKeys As String)
     StatusForm.Update_Status ("Exporting data to csv file ...")
     On Error GoTo Cleanup
     'Create csv file with the name of the table
-    FullFileNameWithPath = FullFileName(fileName, windowsTempDirectory)
+    FullFileNameWithPath = fullFileName(fileName, windowsTempDirectory)
     'Create the stage
     stageCreated = createStage(stageName)
     'Save CSV file and execute 'put'
@@ -261,7 +263,7 @@ Sub uploadNeedsStoredProcs(copyType)
     On Error GoTo ErrorHandlerUpload
     StatusForm.Update_Status ("Loading data...")
     Dim numberOfColumns As Integer
-    numberOfColumns = dataWorksheet.UsedRange.Columns.Count
+    numberOfColumns = dataWorksheet.UsedRange.columns.Count
     sqlString = "call create_table_from_file_and_load('" & tableName & "','" & stageName & "','" & fileName & "','" & copyType & "','" & mergeKeys & "'," & numberOfColumns & ");"
     Call Utils.ExecSQL(statusWorksheet, nextStatusCellToLoad, sqlString)
     Exit Sub
@@ -336,22 +338,22 @@ Sub DeleteAllEmptyColumns(ws As Worksheet)
     Application.ScreenUpdating = False
 
     For ColIndex = LastRowIndex To 1 Step -1
-        If Application.CountA(ws.Columns(ColIndex)) = 0 Then
-            ws.Columns(ColIndex).Delete
+        If Application.CountA(ws.columns(ColIndex)) = 0 Then
+            ws.columns(ColIndex).Delete
         End If
     Next ColIndex
 
     Application.ScreenUpdating = True
 End Sub
 
-Function FullFileName(fileName As String, windowsDirectory As String) As fileNameWithPath
+Function fullFileName(fileName As String, windowsDirectory As String) As fileNameWithPath
     Dim windowsTempDirectory As String
     Dim snowflakeDirectory As String
 
     #If Mac Then
     ' FullFileName.save = "/excel" & "/" & fileName
-    FullFileName.save = CreateFolderinMacOffice2016(NameFolder:="snowflake_put") & "/" & fileName
-    FullFileName.put = FullFileName.save
+    fullFileName.save = CreateFolderinMacOffice2016(NameFolder:="snowflake_put") & "/" & fileName
+    fullFileName.put = fullFileName.save
     #Else
     On Error GoTo ErrorHandlerGetDirectory
     windowsTempDirectory = windowsDirectory
@@ -365,11 +367,11 @@ Function FullFileName(fileName As String, windowsDirectory As String) As fileNam
         MkDir snowflakeDirectory
     End If
     'FullFileName = directory & "/" & fileName
-    FullFileName.save = snowflakeDirectory & "\" & fileName
-    FullFileName.put = Replace(FullFileName.save, "\", "\\")
+    fullFileName.save = snowflakeDirectory & "\" & fileName
+    fullFileName.put = Replace(fullFileName.save, "\", "\\")
     #End If
-    Debug.Print "Saving File to = " & FullFileName.save
-    Debug.Print "put from location = " & FullFileName.put
+    Debug.Print "Saving File to = " & fullFileName.save
+    Debug.Print "put from location = " & fullFileName.put
     Exit Function
 ErrorHandlerGetDirectory:
     Call Utils.handleError("Error trying to get or create directory '" & windowsDirectory & "\Snowflake'.", err)
@@ -397,10 +399,10 @@ Sub AddDataTypeDropDowns()
     ' need to activate this because this Cells(giStartingRowForUpload, 1), will get the value of the active cell
     dataWorksheet.Activate
     Set UsedRng = dataWorksheet.UsedRange
-    LastColIndex = UsedRng.Columns.Count  'UsedRng.Rows.Count
+    LastColIndex = UsedRng.columns.Count  'UsedRng.Rows.Count
     ' If there isn't data then bail
     If LastColIndex > 0 Then
-        'Check if the firs cell has a dropdown already. If it does than it means that we should update not insert the row
+        'Check if the first cell has a dropdown already. If it does than it means that we should update not insert the row
         On Error Resume Next
         t = dataWorksheet.Cells(giStartingRowForUpload, 1).Validation.Type
         On Error GoTo 0
@@ -413,7 +415,7 @@ Sub AddDataTypeDropDowns()
         With rRange.Validation
             .Delete
             .Add Type:=xlValidateList, AlertStyle:=xlValidAlertStop, Operator:= _
-      xlBetween, Formula1:=CustomRange(sgRangeDataTypes).name
+      xlBetween, Formula1:=sgDatatypes
             .IgnoreBlank = True
             .InCellDropdown = True
             .InputTitle = ""
@@ -446,7 +448,7 @@ Function createMergeSQL()
     'create array of keys
     keys = Split(mergeKeys, ",")
 
-    numberOfColumns = dataWorksheet.UsedRange.Columns.Count
+    numberOfColumns = dataWorksheet.UsedRange.columns.Count
     For i = 1 To numberOfColumns
         colName = dataWorksheet.Cells(iHeaderRow, i)
         If colName <> "" Then
@@ -501,7 +503,7 @@ Function createCopySQL()
 
     If columnHeadersProvided Then
         Set dataWorksheet = getDataWorksheet()
-        numberOfColumns = dataWorksheet.UsedRange.Columns.Count
+        numberOfColumns = dataWorksheet.UsedRange.columns.Count
         For i = 1 To numberOfColumns
             colName = dataWorksheet.Cells(iHeaderRow, i)
             If colName <> "" Then
@@ -554,7 +556,7 @@ Sub createTableLocal()
     'Create clone table
     clonedTable = createClone(tableName)
 
-    numberOfColumns = dataWorksheet.UsedRange.Columns.Count
+    numberOfColumns = dataWorksheet.UsedRange.columns.Count
     For i = 1 To numberOfColumns
         colName = dataWorksheet.Cells(iHeaderRow, i)
         If colName <> "" Then
@@ -596,7 +598,7 @@ Sub addColumns()
     clonedTable = createClone(tableName)
 
     On Error GoTo ErrorHandlerAddColumns
-    numberOfColumns = dataWorksheet.UsedRange.Columns.Count
+    numberOfColumns = dataWorksheet.UsedRange.columns.Count
     For i = 1 To numberOfColumns
         colName = dataWorksheet.Cells(iHeaderRow, i)
         datatype = dataWorksheet.Cells(iHeaderRow - 1, i)
@@ -832,7 +834,7 @@ Sub detectDateFormat()
     Dim dateInputFormat As String
 
     dateFormat = ""
-    numberOfColumns = dataWorksheet.UsedRange.Columns.Count
+    numberOfColumns = dataWorksheet.UsedRange.columns.Count
     For i = 1 To numberOfColumns
         Set cellToCheck = dataWorksheet.Cells(iHeaderRow + 1, i)
         If vba.IsDate(cellToCheck) Then

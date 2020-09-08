@@ -1,4 +1,6 @@
 Attribute VB_Name = "Query"
+' Not used yet
+Dim arrSQLUpdateWords As Variant
 
 Sub ExecuteSQL(sqlString As String)
     If sqlString = "" Then
@@ -85,4 +87,12 @@ End Sub
 
 Function getDownloadDateTime()
     getDownloadDateTime = FormCommon.initializeRange("LockTableDate")
+End Function
+
+' Started this function for catching if a user is trying to update data or DDL in the SQL textbox. Should not be allowed for Read only users. Not implementing yet
+Function getArrSQLUpdateWords()
+    If IsEmpty(arrSQLUpdateWords) Then
+        arrSQLUpdateWords = Split(sgSQLUpdateWords, ",")
+    End If
+    getArrSQLUpdateWords = arrSQLUpdateWords
 End Function

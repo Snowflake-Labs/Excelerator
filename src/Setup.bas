@@ -1,29 +1,50 @@
 Attribute VB_Name = "Setup"
+Dim arrSnowflakeConfigRanges() As String
 
 
-'***These procs should not be needed anymore. Mybae useful for the Mac
-Sub Add_Button(caption As String, action As String)
+Sub ConfigSnowflakeAddIn()
+    If ActiveWorkbook Is Nothing Or Not ThisWorkbook.IsAddin Then
+        Exit Sub
+    End If
+    
+    For Each n In ThisWorkbook.Names
+        On Error GoTo createName
+        
+    Next n
 
-    Dim control As CommandBarButton
-    Dim cmdBar As CommandBar
-    Set cmdBar = Application.CommandBars("Worksheet Menu Bar")
-    On Error Resume Next
-    cmdBar.Controls(caption).Delete
-    On Error GoTo 0
-
-    Set control = cmdBar.Controls.Add
-    With control
-        .caption = caption
-        .Style = msoButtonIconAndCaptionBelow 'msoButtonCaption
-        .OnAction = action
-    End With
 End Sub
 
-Sub Remove_Button() ' this is for running manually to remove a button
-    Dim control As CommandBarButton
-    Dim cmdBar As CommandBar
-    Set cmdBar = Application.CommandBars("Worksheet Menu Bar")
-    'On Error Resume Next
-    cmdBar.Controls("Execute SQL").Delete
-    On Error GoTo 0
-End Sub
+
+'Public Const sgRangeWorksheetVersionNumber As String = "sfWorksheetVersionNumber"
+'
+''Connection
+'Public Const sgRangeSnowflakeDriver As String = "sfSnowflakeDriver"
+'Public Const sgRangeAuthType As String = "sfAuthType"
+'Public Const sgRangeDefaultDatabase As String = "sfDatabase"
+'Public Const sgRangeUserID As String = "sfUserID"
+'Public Const sgRangeRole As String = "sfRole"
+'Public Const sgRangeDefaultSchema As String = "sfSchema"
+'Public Const sgRangeServer As String = "sfServer"
+'Public Const sgRangeStage As String = "sfStage"
+'Public Const sgRangeWarehouse As String = "sfWarehouse"
+'Public Const sgRangePassword As String = "sfPassword"
+'
+'Public Const sgRangeResultsWorksheet As String = "sfResultsWorksheet"
+'Public Const sgRangeUploadWorksheet As String = "sfUploadWorksheet"
+'Public Const sgRangeLogWorksheet As String = "sfLogWorksheet"
+'
+'Public Const sgRangeDateInputFormat As String = "sfDateInputFormat"
+'Public Const sgRangeTimestampInputFormat As String = "sfTimestampInputFormat"
+'Public Const sgRangeTimeInputFormat As String = "sfTimeInputFormat"
+'
+'Public Const sgRangeWindowsTempDirectory As String = "sfWindowsTempDirectory"
+'
+'Sub setRangeDefaultValues()
+'    Utils.CustomRange(sgRangeSnowflakeDriver) = "{SnowflakeDSIIDriver}"
+'    Utils.CustomRange(sgRangeAuthType) = "User & Pass"
+'    Utils.CustomRange(sgRangeLogWorksheet) = "Log"
+'    Utils.CustomRange(sgRangeWindowsTempDirectory) = "C:\temp"
+'    Utils.CustomRange(sgRangeDateInputFormat) = "Auto"
+'    Utils.CustomRange(sgRangeTimestampInputFormat) = "Auto"
+'    Utils.CustomRange(sgRangeTimeInputFormat) = "Auto"
+'End Sub

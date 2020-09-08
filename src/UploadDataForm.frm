@@ -16,6 +16,8 @@ Attribute VB_Exposed = False
 
 
 
+
+
 Dim sKeyExample As String
 Dim bValidMergKeys As Boolean
 Dim bShowMergKeyMessage As Boolean
@@ -25,7 +27,6 @@ Dim uploadMergeKeysByLettersRange As range
 Dim uploadTypeRange As range
 Dim schemaComboboxInitialized As Boolean
 Dim bInitializing As Boolean
-Dim newTableName As String
 
 Public Sub UserForm_Initialize()
     'Set uploadWorksheet = ActiveWorkbook.Sheets(CustomRange(sgRangeUploadWorksheet).value)
@@ -235,9 +236,8 @@ End Sub
 
 Public Sub uploadData(sUploadType As String)
     Dim uploadTable As String
-    ' need to set focus because the form doesn't pick up the change until they tab off
     If cbCreateNewTable Then
-        cbTables.value = newTableName
+        cbTables.value = tbNewTableName
     End If
     Call FormCommon.saveDBObjectsValues(cbDatabases, cbSchemas, cbTables)
     If cbTables.value = "" Then
@@ -336,14 +336,17 @@ Private Sub cbCreateNewTable_Click()
     If cbCreateNewTable Then
         Set GetValueForm = Nothing
         GetValueForm.setMessage ("Enter Table Name:")
+        GetValueForm.setValue (tbNewTableName)
         GetValueForm.Show
-        newTableName = UCase(GetValueForm.Getvalue)
-        If newTableName = "" Then
-            MsgBox ("A table name must be entered to select this option.")
-            cbCreateNewTable = False
-        Else
+        If GetValueForm.okClicked Then
+            tbNewTableName = UCase(GetValueForm.Getvalue)
+            If tbNewTableName = "" Then
+                cbCreateNewTable = False
+            End If
             cbRecreateTable = False
             handleCreateOrRecreateCheck
+        Else
+            cbCreateNewTable = False
         End If
     Else
         handleCreateOrRecreateCheck
@@ -365,6 +368,13 @@ Sub handleCreateOrRecreateCheck()
         rbTruncate.Enabled = True
         lblMergeKeys.Enabled = True
     End If
+    
+    If cbCreateNewTable Then
+        tbNewTableName.Enabled = True
+    Else
+        tbNewTableName.Enabled = False
+    End If
+    
     setUploadTypeText
     setMergeKeysBorderColor
 End Sub

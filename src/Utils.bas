@@ -303,11 +303,6 @@ Function execSQLToArray(sqlString As String) As Variant()
     If Not rs.EOF Then
         execSQLToArray = rs.GetRows
     End If
-    '    Do While Not rs.EOF
-    '        cbResults.AddItem (rs.Fields(0))
-    '        rs.MoveNext
-    '    Loop
-
     rs.Close
     Exit Function
 ErrorHandlerExecSQL:
@@ -472,10 +467,10 @@ End Function
 
 Sub SaveAllNamedRangesToAddIn()
     Dim nm As name
-
+    'We want to save the named ranges to the addin so next time they open a new workbook, the connectino values will be there
     On Error Resume Next
     For Each nm In Names
-        If nm.name <> "sfDataTypes" And CustomRange(nm.name).Count = 1 And InStr(nm.value, gsSnowflakeConfigWorksheetName) > 0 Then
+        If CustomRange(nm.name).Count = 1 And InStr(nm.value, gsSnowflakeConfigWorksheetName) > 0 Then
             range(ThisWorkbook.name & "!" & nm.name) = CustomRange(nm.name)
         End If
     Next nm

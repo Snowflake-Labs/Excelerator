@@ -5,8 +5,57 @@ Private Sub Workbook_AddinInstall()
 End Sub
 
 Private Sub Workbook_Open()
+    Debug.Print "Snowflow thisWorkbook_Open()"
     Set app = Excel.Application
+    'Only add ribbon buttons when this is not run as an Addin. These buttons are for Dev only 12
+    If Not ThisWorkbook.IsAddin Then
+        Call AddAllButtons
+    End If
+
 End Sub
+
+Private Sub Workbook_BeforeClose(Cancel As Boolean)
+    Debug.Print "Snowflow thisWorkbook_BeforeClose()"
+    Call RemoveAllButtons
+End Sub
+
+Sub Add_Button(caption As String, action As String)
+    
+    Dim control As CommandBarButton
+    Dim cmdBar As CommandBar
+    Set cmdBar = Application.CommandBars("Worksheet Menu Bar")
+    On Error Resume Next
+    cmdBar.Controls(caption).Delete
+    On Error GoTo 0
+   
+     Set control = cmdBar.Controls.Add
+         With control
+            .caption = caption
+            .Style = msoButtonIconAndCaptionBelow 'msoButtonCaption
+            .OnAction = action
+         End With
+End Sub
+
+Sub AddAllButtons()
+    Call Add_Button("Create Addin", "'Build.createAddin'")
+    Call Add_Button("Export Project Code", "'Build.exportVbProject'")
+    Call Add_Button("Import Project Code", "'Build.importVbProject'")
+End Sub
+Sub RemoveAllButtons()
+    Call Remove_Button("Create Addin")
+    Call Remove_Button("Export Project Code")
+    Call Remove_Button("Import Project Code")
+End Sub
+
+Sub Remove_Button(name As String) ' this is for running manually to remove a button
+    Dim control As CommandBarButton
+    Dim cmdBar As CommandBar
+    Set cmdBar = Application.CommandBars("Worksheet Menu Bar")
+    On Error Resume Next
+    cmdBar.Controls(name).Delete
+    On Error GoTo 0
+End Sub
+
 
 '****************** Not used below here ***********************
 Sub ExportParametersToFile()
@@ -60,8 +109,8 @@ Function getFileName(fileName As String, windowsDirectory As String)
     Dim snowflakeDirectory As String
 
     #If Mac Then
-    FullFileName.save = CreateFolderinMacOffice2016(NameFolder:="snowflake_put") & "/" & fileName
-    FullFileName.put = FullFileName.save
+    fullFileName.save = CreateFolderinMacOffice2016(NameFolder:="snowflake_put") & "/" & fileName
+    fullFileName.put = fullFileName.save
     #Else
     windowsTempDirectory = windowsDirectory
     snowflakeDirectory = windowsDirectory & "\Snowflake"

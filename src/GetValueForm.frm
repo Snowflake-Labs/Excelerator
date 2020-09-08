@@ -13,6 +13,8 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+Dim bOKClicked As Boolean
+
 Private Sub UserForm_Activate()
     tbValue.SetFocus
     With tbValue
@@ -23,11 +25,13 @@ End Sub
 
 Private Sub btOK_Click()
     Me.Hide
+    bOKClicked = True
 End Sub
 
 Private Sub CancelButton_Click()
     tbValue = ""
     Me.Hide
+    bOKClicked = False
 End Sub
 
 Public Function Getvalue()
@@ -42,3 +46,6 @@ Public Sub setValue(value As String)
     tbValue = value
 End Sub
 
+Public Function okClicked()
+    okClicked = bOKClicked
+End Function

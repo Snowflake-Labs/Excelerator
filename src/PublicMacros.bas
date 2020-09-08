@@ -55,8 +55,3 @@ Sub RollbackLastUpdateFromRibbon(control As IRibbonControl)
         Call Load.RollbackLastUpdateWithCheck
     End If
 End Sub
-
-Sub RibbonOnLoad(ribbon As IRibbonUI)
-    Set gRibbon = ribbon
-    'Rib.ActivateTab "Configure" ' Name of the tab to activate
-End Sub

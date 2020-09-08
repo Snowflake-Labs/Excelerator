@@ -269,7 +269,7 @@ Public Function getColumnArray(database As String, schema As String, table As St
         getColumnArray = dictColumns(key)
     Else
         sql = "select column_name, data_type from """ & database & """.information_schema.columns where table_schema = '" & _
-        schema & "' and table_name = '" & table & "'"
+        schema & "' and table_name = '" & table & "' order by ordinal_position"
         getColumnArray = Utils.execSQLToArray(sql)
         dictColumns.Add Item:=getColumnArray, key:=key
     End If
