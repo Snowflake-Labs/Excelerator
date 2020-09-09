@@ -444,7 +444,7 @@ Function checkStoredProcCompatibility(ws As Worksheet)
     Exit Function
 ErrorHandlerSPDoesNoteExist:
     If err.Number = 2000 Then
-        MsgBox ("In order to auto-generate data types, the SnowFlow stored procedures must be created in the database you have logged into. " & _
+        MsgBox ("In order to auto-generate data types, the Snowflake-Excel stored procedures must be created in the database you have logged into. " & _
         vbNewLine & "If you want to explicity define the data types please see click the 'Define Data Types' button in the ribbon.")
     Else
         MsgBox ("Error trying to retrieve Stored Procedure version number. " & err.Description)
@@ -620,6 +620,13 @@ Function worksheetBelongsToAddin()
     End If
 End Function
 
-
+Function doesWorksheetExist()
+    If ActiveSheet Is Nothing Then
+        MsgBox ("There is no Worksheet available. Please create one before proceeding.")
+        doesWorksheetExist = False
+        Exit Function
+    End If
+    doesWorksheetExist = True
+End Function
 
 

@@ -6,7 +6,7 @@ Public Const gWorkbookSPCompatibilityVers As Integer = 2                    ' Us
 Public Const gsQueryResultsCell As String = "A1"
 Public Const giStartingRowForUpload As Integer = 1
 Public Const sgLastCellOnLogWS As String = "A10000"
-Public Const sgParameterFileName As String = "SnowFlowExcelAddin.ini"
+Public Const sgParameterFileName As String = "SnowflakeExcelAddin.ini"
 Public Const sgParameterFileDirectory As String = "C:/temp"
 
 'Checks versioning of worksheet. If active worksheet has an older one then it deletes it and copies a new one

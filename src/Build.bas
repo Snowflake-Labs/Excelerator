@@ -50,10 +50,10 @@ Sub createAddin()
     ' Application.DisplayAlerts = False
     Set wb = Workbooks(ActiveWorkbook.name)
     Call RibbonModule.setAddinReadWrite
-    wb.SaveAs fileName:=ThisWorkbook.Path & "\" & "SnowFlowExcelAddin.xlam", FileFormat:=xlOpenXMLAddIn, CreateBackup:=False
+    wb.SaveAs fileName:=ThisWorkbook.Path & "\" & "SnowflakeExcelAddin.xlam", FileFormat:=xlOpenXMLAddIn, CreateBackup:=False
     
     Call RibbonModule.setAddinReadOnly
-    wb.SaveAs fileName:=ThisWorkbook.Path & "\" & "SnowFlowExcelAddinReadOnly.xlam", FileFormat:=xlOpenXMLAddIn, CreateBackup:=False
+    wb.SaveAs fileName:=ThisWorkbook.Path & "\" & "SnowflakeExcelAddinReadOnly.xlam", FileFormat:=xlOpenXMLAddIn, CreateBackup:=False
     'Open the original app
     Workbooks.Open origFullFileName
     'Send a request to the orig file to delete this file

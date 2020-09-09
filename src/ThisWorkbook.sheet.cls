@@ -5,7 +5,7 @@ Private Sub Workbook_AddinInstall()
 End Sub
 
 Private Sub Workbook_Open()
-    Debug.Print "Snowflow thisWorkbook_Open()"
+    Debug.Print "Snowflake thisWorkbook_Open()"
     Set app = Excel.Application
     'Only add ribbon buttons when this is not run as an Addin. These buttons are for Dev only 12
     If Not ThisWorkbook.IsAddin Then
@@ -15,7 +15,7 @@ Private Sub Workbook_Open()
 End Sub
 
 Private Sub Workbook_BeforeClose(Cancel As Boolean)
-    Debug.Print "Snowflow thisWorkbook_BeforeClose()"
+    Debug.Print "Snowflake thisWorkbook_BeforeClose()"
     Call RemoveAllButtons
 End Sub
 
