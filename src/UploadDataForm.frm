@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} UploadDataForm 
    Caption         =   "Upload Data"
-   ClientHeight    =   8040
+   ClientHeight    =   7815
    ClientLeft      =   120
    ClientTop       =   465
    ClientWidth     =   5850

@@ -32,6 +32,7 @@ Sub createAddin()
     Dim wb As Workbook
     Dim fileName As String
     Dim origFileName As String, origFullFileName As String, tempFullFileName As String
+    Dim sworksheetVersionNumber As String
     
     Application.ScreenUpdating = False
     Application.DisplayAlerts = False
@@ -45,8 +46,13 @@ Sub createAddin()
 
     'Delete all worksheets except the config one
     CleanupWorksheets
+    'capture worksheet version number so it can be applied back after the cleanup
+    sworksheetVersionNumber = Utils.CustomRange(sgRangeWorksheetVersionNumber)
     ' Remove ranges that are invalid and set others to empty
     CleanupRanges
+    're-aply the worksheet version number
+    Utils.CustomRange(sgRangeWorksheetVersionNumber) = sworksheetVersionNumber
+    
     ' Application.DisplayAlerts = False
     Set wb = Workbooks(ActiveWorkbook.name)
     Call RibbonModule.setAddinReadWrite
@@ -87,6 +93,7 @@ Sub CleanupRanges()
 End Sub
 
 Sub setRangeDefaultValues()
+    ' all ranges set to the default except the worksheet version number. That should be set in the calling sub
     Utils.CustomRange(sgRangeSnowflakeDriver) = "{SnowflakeDSIIDriver}"
     Utils.CustomRange(sgRangeAuthType) = "User & Pass"
     Utils.CustomRange(sgRangeLogWorksheet) = "Log"
