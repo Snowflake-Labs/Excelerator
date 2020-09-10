@@ -1,6 +1,7 @@
 # Excelerator: Use Snowflake in Excel
 
-Excelerator is an Excel plugin to help you flow data in and out of Snowflake using Excel.
+Excelerator is an Excel plugin to help you pull data in from Snowflake into Excel and push data from Excel into Snowflake.
+Excelerator is only compatible with the Windows operating system, not the MacOS.
 
 Example use-cases include:
 * financial budgeting write-back,
