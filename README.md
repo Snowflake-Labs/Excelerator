@@ -1,6 +1,6 @@
 # Excelerator: Use Snowflake in Excel
 
-Excelerator is an Excel plugin to help you pull data in from Snowflake into Excel and push data from Excel into Snowflake.
+Excelerator is an Excel Add-In to help you pull data from Snowflake into Excel and push new or updated data from Excel into Snowflake.
 Excelerator is only compatible with the Windows operating system, not the MacOS.
 
 Example use-cases include:
@@ -17,9 +17,15 @@ Example use-cases include:
 
 To get started, you'll need to:
 
-1. Install the plugin in Excel (below)
-2. [Connect your Snowflake account](#use-excelerator)
-3. [Query Snowflake](#execute-a-query) and optionally [write data back](#write-data-to-snowflake)
+1. Install the Windows 64-bit or 43-bit ODBC driver for Snowflake
+2. Install the Add-In in Excel (below)
+3. [Connect your Snowflake account](#use-excelerator)
+4. [Query Snowflake](#execute-a-query) and optionally [write data back](#write-data-to-snowflake)
+
+## Install the ODBC Driver
+The Excel Add-In requires the ODBC driver. To download the driver, go to: https://sfc-repo.snowflakecomputing.com/odbc/index.html
+Select the version of the ODBC driver, 64-bit or 32-bit, based on the local Excel installation. Make sure it matches or the Add-In will not work.
+Once downloaded, install the driver. 
 
 ## Install Excelerator
 
@@ -29,7 +35,7 @@ To begin, clone or download this repository to get your own copy of all the file
 
 This step is only needed to enable the "Data Type Auto-generation" feature when adding a new table or column. Without the stored procedures, you'll have to define the data types for each new column.
 
-If you have access to the Snowflake web interface and a role with elevated privileges such as "ACCOUNTADMIN", you can run `SnowflakeExcelAddin_Stored_Procedures.sql`.  If you don't have access, then contact your Snowflake DBA and have them run the script for you.  This script will need to be run in the same database that you login into with the Excel Addin, which we discuss below.
+If you have access to the Snowflake web interface and a role with elevated privileges such as "ACCOUNTADMIN", you can run `SnowflakeExcelAdd-In_Stored_Procedures.sql`.  If you don't have access, then contact your Snowflake DBA and have them run the script for you.  This script will need to be run in the same database that you login into with the Excel Add-In, which we discuss below.
 
 ### Step 2: Set Required Privileges
 
@@ -65,27 +71,16 @@ For advanced features: Auto-generate Data Types
 * usage on all functions
 * usage on future functions
 
-One approach for handling these privileges is to create a new role with the above Schema and Database privileges and assigned that role existing role with the Table level privileges.
-
-`SnowflakeExcelAddin_Create_Role.sql` is provided to create this role and assigns the role to a parent role.
-
-You’ll have to update the script before executing it with the information specific to your environment. In the script, you will be providing the parent role. Then you'll use the parent role when logging in.
+Optional
+The following script will create a new role with the proper privileges, except the table level privileges: `SnowflakeExcelAdd-In_Create_Role.sql` 
+You’ll have to update the script before executing it with the information specific to your environment. In the script, you will be providing the role of the user that will be using this Add-In. The script will assign the new to the existing role, which will inherit all the privileges defined in the script.
 
 ### Step 3 – Install Excel Add-in
 
-There are 2 versions of the Excel Add-in, one for only reading data from Snowflake and one for reading and writing data to snowflake. The Excel Add-ins are Excel files with an extenstion of ".xlam". The .xlam file for the read-only version is called "SnowflakeExcelAddinReadOnly.xlam". The full read-write version is called "SnowflakeExcelAddin.xlam". These files are both stored in the repository. In order to install theseadd-ins, make sure you have access to the "Developer" tab within Excel's menu. If you son't have the "Developer" tab, you can add it by right-clicking on the toolbar, selecting “customize the ribbon", and then clicking its checkbox.
+There are 2 versions of the Excel Add-in, one for only reading data from Snowflake and one for reading and writing data to snowflake. The Excel Add-ins are Excel files with an extension of ".xlam". The .xlam file for the read-only version is called "SnowflakeExcelAdd-InReadOnly.xlam". The full read-write version is called "SnowflakeExcelAdd-In.xlam". These files are both stored in the repository. In order to install these add-ins, follow the instructions here: https://exceloffthegrid.com/install-uninstall-excel-add/. 
 
-![](images/image1.jpg)
 
-From the Developer menu, select "Excel Add-Ins":
-
-![](images/image2.png)
-
-Navigate to the directory where the ".xlam" files were saved and select the one you want to install.  Make sure to check the plugin before selecting OK.
-
-<img src="images/image3.png" width=50% >
-
-At this point, Excelerator is available within Excel. You'll see a UI within the "Home" tab.
+The Excelerator is now available on the Home tab of the Ribbon.
 
 ## Use Excelerator
 
@@ -108,11 +103,11 @@ In the `Role` field, add the role that you entered into the script in Step 3.
 
 ### Overview
 
-Now we'll walk you through each section of the plugin. You can work with data sourced from other data sources within Excel (such as files) or you can pull data from Snowflake into Excel.  You can manipulate the data using VBA scripts and vlookups, but be sure to write that final data back to Snowflake! The plugin handles both reading and writing scenarios.
+Now we'll walk you through each section of the Add-In. You can work with data sourced from other data sources within Excel (such as files) or you can pull data from Snowflake into Excel.  You can manipulate the data using VBA scripts and vlookups, but be sure to write that final data back to Snowflake! The Add-In handles both reading and writing scenarios.
 
 ### Execute a Query
 Pull data into Excel by selecting the “Query" button. 
-A search dialog will open that allows you to select a database, schema and table in order to download data. Once you select a table you can then choose which columns you would like to reutrn from the selected table. You can select all the columns by clicking the "All" button, or select a subset of columns by clicking the "Choose" button. Once selected, a SQL statement is created and entered in the buttom text area. This SQL statement can be manually updated.
+A search dialog will open that allows you to select a database, schema and table in order to download data. Once you select a table you can then choose which columns you would like to reutrn from the selected table. You can select all the columns by clicking the "All" button, or select a subset of columns by clicking the "Choose" button. Once selected, a SQL statement is created and entered in the bottom text area. This SQL statement can be manually updated.
 Click the "Execute" button to execute the query in Snowflake and pull down the result set.
 
 ![](images/image6.jpg)
@@ -136,11 +131,11 @@ In the top section, choose the database, schema and table to upload the data to.
 There are 3 basic ways to upload data into a table:
 * Update existing rows & Append new rows 
 * Append data - This will insert all the data into the table.
-* Replace all data in the table with the data from the spreadhseet - All the data will be deleted from the table and then the new data will be inserted.
+* Replace all data in the table with the data from the spreadsheet - All the data will be deleted from the table and then the new data will be inserted.
 
 When selecting the first option, you will have to define the columns that represent the table key. The key defines how each row is unique, and is used to update existing rows. This can be done by entering the column position, for example: A,B,C.  In this case the first 3 columns in the excel sheet and target table will be the key.
 
-With any of the above options, if a column exists in the spreadsheet, but does not exist in the table, it will be added automotically to the Snowflake table. The data type can be specified by clicking the "Define Data Types" button in the ribbon. If you prefer to have Snowflake determine the data types, select the "Auto-generate data types" in the "Advance Options" section below.
+With any of the above options, if a column exists in the spreadsheet, but does not exist in the table, it will be added automatically to the Snowflake table. The data type can be specified by clicking the "Define Data Types" button in the ribbon. If you prefer to have Snowflake determine the data types, select the "Auto-generate data types" in the "Advance Options" section below.
 
 #### "Advanced Options" section 
 This section allows more options:

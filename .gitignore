@@ -6,3 +6,5 @@ Test-xlam/desktop.ini
 Test-xlam/SnowFlowExcelAddin.xlam
 ~$SnowFlowExcelAddin.xlam
 ~$SnowflakeExcelAddin.xlam
+Test-xlam/SnowflakeExcelAddinTEST.xlam
+Test-xlam/~$SnowflakeExcelAddinTEST.xlam
