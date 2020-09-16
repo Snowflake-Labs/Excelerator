@@ -28,6 +28,8 @@ Dim uploadTypeRange As range
 Dim schemaComboboxInitialized As Boolean
 Dim bInitializing As Boolean
 
+
+
 Public Sub UserForm_Initialize()
     'Set uploadWorksheet = ActiveWorkbook.Sheets(CustomRange(sgRangeUploadWorksheet).value)
     '  Dim uploadMergeKeysRange_Name As String
@@ -211,7 +213,7 @@ End Function
 
 Public Sub btUpload_Click()
     Dim bContinue As Boolean
-    If Right(cbTables.value, 1) = "." Or cbTables.value = "" Then
+    If Not cbCreateNewTable And (Right(cbTables.value, 1) = "." Or cbTables.value = "") Then
         MsgBox ("Please enter a valid table name.")
     Else
         bContinue = True
@@ -271,16 +273,18 @@ Public Sub uploadData(sUploadType As String)
                     sUploadType = "Merge"
             End Select
             Else ' do everything local
-            Select Case True
-                Case cbRecreateTable Or cbCreateNewTable
-                    sUploadType = "RecreateLocal"
-                Case rbTruncate
-                    sUploadType = "TruncateLocal"
-                Case rbAppend
-                    sUploadType = "AppendLocal"
-                Case rbMerge
-                    sUploadType = "MergeLocal"
-            End Select
+                Select Case True
+                    Case cbCreateNewTable
+                        sUploadType = "CreateLocal"
+                    Case cbRecreateTable
+                        sUploadType = "RecreateLocal"
+                    Case rbTruncate
+                        sUploadType = "TruncateLocal"
+                    Case rbAppend
+                        sUploadType = "AppendLocal"
+                    Case rbMerge
+                        sUploadType = "MergeLocal"
+                End Select
         End If
         Utils.SaveAllNamedRangesToAddIn
         Set StatusForm = Nothing

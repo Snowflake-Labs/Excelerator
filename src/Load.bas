@@ -101,7 +101,8 @@ Sub uploadData(copyType As String, inTableName As String, inMergeKeys As String)
             addColumns
             truncateTable
             copyDataLocal (copyType)
-        Case copyType = "RecreateLocal"
+        Case copyType = "RecreateLocal" Or copyType = "CreateLocal"
+            If copyType = "CreateLocal" Then On Error GoTo ErrorHandlerSimpleUpdateNoRollback
             createTableLocal
             copyDataLocal (copyType)
             Call FormCommon.dropDBObjectsTableCache
@@ -150,6 +151,9 @@ ErrorHandlerSimpleUpdate:
     End If
     'this needs to come after the err.Number check beacuse it resets the err number
     Call rollback(tableName, clonedTable)
+    Exit Sub
+ErrorHandlerSimpleUpdateNoRollback:
+    StatusForm.Hide
     Exit Sub
 ErrorHandleruploadNeedsStoredProcs:
     If err.Number = giSuppressErrorMessage Then
