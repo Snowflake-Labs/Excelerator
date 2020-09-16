@@ -17,7 +17,7 @@ Example use-cases include:
 
 To get started, you'll need to:
 
-1. Install the Windows 64-bit or 43-bit ODBC driver for Snowflake
+1. Install the Windows 64-bit or 32-bit ODBC driver for Snowflake
 2. Install the Add-In in Excel (below)
 3. [Connect your Snowflake account](#use-excelerator)
 4. [Query Snowflake](#execute-a-query) and optionally [write data back](#write-data-to-snowflake)
