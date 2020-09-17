@@ -1,7 +1,7 @@
 Attribute VB_Name = "Globals"
 ' When adding a new named range to the Config sheet, you should update the Build.setRangeDefaultValues sub to set the defaults
 'from Utils module
-Public Const gWorkbookVers As String = "1.05"                                ' This is just for information
+Public Const gWorkbookVers As String = "1.06"                                ' This is just for information
 Public Const gWorkbookSPCompatibilityVers As Integer = 2                    ' Used to ensure the proper Stored Procs are used
 Public Const gsQueryResultsCell As String = "A1"
 Public Const giStartingRowForUpload As Integer = 1
