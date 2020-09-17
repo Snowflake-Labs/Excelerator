@@ -367,7 +367,7 @@ Sub createTableForAllDataOnWorksheet(ws As Worksheet)
     Set UsedRng = ws.UsedRange
     If UsedRng.Cells(1, 1) <> "" Then
         'LastRowIndex = UsedRng.Row - 1 + UsedRng.Rows.Count
-        Set tableListObj = ws.ListObjects.Add(xlSrcRange, UsedRng, , xlYes)
+        ws.ListObjects.Add(xlSrcRange, UsedRng, , xlYes).name = ws.CodeName
     End If
     #End If
 End Sub
