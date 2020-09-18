@@ -9,9 +9,7 @@ Example use-cases include:
 * pricing analysis,
 * and more!
 
-| :memo: LEGAL              |
-|:---------------------------|
-|Excelerator is not a supported product by Snowflake or any company. Excelerator will write data to the Snowflake database and should be used with great care. Use at your own risk. |
+Excelerator is not a supported product by Snowflake or any company. Excelerator will write data to the Snowflake database and should be used with great care. Use at your own risk.
 
 ## Get Started with Excelerator
 
