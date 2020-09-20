@@ -9,7 +9,6 @@ Sub ConfigSnowflakeAddIn()
     
     For Each n In ThisWorkbook.Names
         On Error GoTo createName
-        
     Next n
 
 End Sub

@@ -19,10 +19,10 @@ End Sub
 
 Public Function isAddinReadOnly()
     On Error GoTo ErrorHandlerNotDefined
-    isAddinReadOnly = range(ThisWorkbook.name & "!" & sgRangeReadOnly)
+    isAddinReadOnly = range("'" & ThisWorkbook.name & "'" & "!" & sgRangeReadOnly)
     Exit Function
 ErrorHandlerNotDefined:
-    isAddinReadOnly "False"
+    isAddinReadOnly = "False"
 End Function
 
 Public Sub setAddinReadOnly()

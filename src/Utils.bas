@@ -471,11 +471,11 @@ Sub SaveAllNamedRangesToAddIn()
     On Error Resume Next
     For Each nm In Names
         If CustomRange(nm.name).Count = 1 And InStr(nm.value, gsSnowflakeConfigWorksheetName) > 0 Then
-            range(ThisWorkbook.name & "!" & nm.name) = CustomRange(nm.name)
+            range("'" & ThisWorkbook.name & "'" & "!" & nm.name) = CustomRange(nm.name)
         End If
     Next nm
     If Not PersistPassword Then
-        range(ThisWorkbook.name & "!" & sgRangePassword) = ""
+        range("'" & ThisWorkbook.name & "'" & "!" & sgRangePassword) = ""
     End If
     On Error GoTo 0
     ThisWorkbook.save
@@ -515,7 +515,7 @@ Sub CopySnowflakeConfgWS()
     On Error GoTo HandleworksheetNotExist
     iWSVersionNumber = Utils.CustomRange(sgRangeWorksheetVersionNumber)
     On Error GoTo 0
-    If iWSVersionNumber >= range(ThisWorkbook.name & "!" & sgRangeWorksheetVersionNumber) Then
+    If iWSVersionNumber >= range("'" & ThisWorkbook.name & "'" & "!" & sgRangeWorksheetVersionNumber) Then
         Exit Sub
     End If
 
