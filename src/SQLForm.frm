@@ -248,7 +248,7 @@ End Sub
 
 Sub btSaveSQL_Click()
     Dim index As Integer
-    'Check to see if SQL is empty of the default message
+    'Check to see if SQL is empty or the default message
     If tbSQL = "" Or tbSQL = emptySQLMessage Then
         MsgBox ("Please enter a SQL statement before saving.")
         tbSQL = emptySQLMessage
@@ -258,7 +258,7 @@ Sub btSaveSQL_Click()
     If cbSQLList.ListIndex > -1 Then
         index = cbSQLList.ListIndex
         sqlRangeSQL.Cells(index + 1, 1) = tbSQL
-        sqlRangeName.Cells(index + 1, 1) = Replace(tbSQL, vbCrLf, " ")
+       ' sqlRangeName.Cells(index + 1, 1) = Replace(tbSQL, vbCrLf, " ")
         'This updates the combobox
         cbSQLList.RowSource = sqlRangeName_Name
         cbSQLList.ListIndex = index

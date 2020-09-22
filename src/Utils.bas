@@ -477,7 +477,7 @@ Sub SaveAllNamedRangesToAddIn()
     If Not PersistPassword Then
         range("'" & ThisWorkbook.name & "'" & "!" & sgRangePassword) = ""
     End If
-    On Error GoTo 0
+    'On Error GoTo 0
     ThisWorkbook.save
 End Sub
 
