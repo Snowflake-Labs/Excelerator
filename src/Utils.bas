@@ -27,12 +27,16 @@ Function ConnectionStringDSNLess()
 
     ConnectionStringDSNLess = connectionType & "driver={SnowflakeDSIIDriver};server=" & LoginForm.tbServer & ";database=" & _
        LoginForm.tbDatabase & ";schema=" & LoginForm.tbSchema & ";warehouse=" & LoginForm.tbWarehouse & ";role=" & _
-       LoginForm.tbRole & ";Uid=" & LoginForm.tbUserID & ";CLIENT_SESSION_KEEP_ALIVE=true;"
+       LoginForm.tbRole & ";Uid=" & LoginForm.tbUserID & ";CLIENT_SESSION_KEEP_ALIVE=true;login_timeout=10;"
 
     If LoginForm.rbSSO Then
         ConnectionStringDSNLess = ConnectionStringDSNLess & "Authenticator=externalbrowser;"
     Else
         ConnectionStringDSNLess = ConnectionStringDSNLess & "Pwd=" & LoginForm.tbPassword & ";"
+        'this is for MFA. Push is handled automatically, but if they need to enter the passcode they use the passcode field
+        If LoginForm.tbPasscode <> "" Then
+            ConnectionStringDSNLess = ConnectionStringDSNLess & "passcode=" & LoginForm.tbPasscode & ";"
+        End If
     End If
     msConnectionStatus = "Server: " & LoginForm.tbServer & "    Database: " & LoginForm.tbDatabase & "    Schema: " & LoginForm.tbSchema & _
         "    Warehouse: " & LoginForm.tbWarehouse & "    User: " & LoginForm.tbUserID & "    Role: " & LoginForm.tbRole
@@ -68,7 +72,15 @@ Sub openConnection(ByRef mDBConnection As ADODB.Connection, connString As String
     Exit Sub
 ErrorHandlerConnection:
     If err.Number <> giCancelEvent Then
-        MsgBox "ERROR: Problem connecting: " & err.Description
+        Dim errMsg As String
+        errMsg = err.Description
+        Select Case True
+            Case InStr(1, err.Description, "code=403") > 0
+                errMsg = "Cannot find server"
+            Case InStr(1, err.Description, "code=504") > 0
+                errMsg = "Timeout occured"
+        End Select
+        MsgBox "ERROR: Problem connecting: " & errMsg
         StatusForm.Hide
     End If
 End Sub
