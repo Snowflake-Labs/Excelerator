@@ -2,6 +2,7 @@
 
 Excelerator is an Excel Add-In to help you pull data from Snowflake into Excel and push new or updated data from Excel into Snowflake.
 Excelerator is only compatible with the Windows operating system, not the MacOS.
+View a demo of Excelerator: https://youtu.be/csmS5V2ONr8
 
 Example use-cases include:
 * financial budgeting write-back,
@@ -12,13 +13,14 @@ Example use-cases include:
 Excelerator is not a supported product by Snowflake or any company. Excelerator will write data to the Snowflake database and should be used with great care. Use at your own risk.
 
 ## Get Started with Excelerator
+Important: When following the instructions below, make sure to 'Unblock' the Addin after downloading. The details are in the link located in Step 3 below.
 
 To get started, you'll need to:
 
-1. Install the Windows 64-bit or 32-bit ODBC driver for Snowflake
-2. Install the Add-In in Excel (below)
-3. [Connect your Snowflake account](#use-excelerator)
-4. [Query Snowflake](#execute-a-query) and optionally [write data back](#write-data-to-snowflake)
+* Install the Windows 64-bit or 32-bit ODBC driver for Snowflake
+* Install the Add-In in Excel (below)
+* [Connect your Snowflake account](#use-excelerator)
+* [Query Snowflake](#execute-a-query) and optionally [write data back](#write-data-to-snowflake)
 
 ## Install the ODBC Driver
 The Excel Add-In requires the ODBC driver. To download the driver, go to: https://sfc-repo.snowflakecomputing.com/odbc/index.html
@@ -43,7 +45,7 @@ To **query** data:
 | **Object** | **Privilege**        |
 |------------|----------------------|
 | Database   | USAGE                |
-| Schema     | USAGE, CREATE STAGE* |
+| Schema     | USAGE|
 | Table      | SELECT               |
 
 \*Stage can be provided in the login instead
@@ -52,7 +54,7 @@ To **upload** data requires everything in query, plus:
 
 | **Object** | **Privilege**            |
 |------------|--------------------------|
-| Schema     | CREATE TABLE             |
+| Schema     | CREATE TABLE,CREATE STAGE|
 | Table      | INSERT, UPDATE, TRUNCATE |
 
 To **rollback** data requires the schema privileges from upload, plus:
