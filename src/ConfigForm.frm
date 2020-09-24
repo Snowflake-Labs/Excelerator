@@ -13,12 +13,6 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
-
-
-
-
-
-
 'For cancel values
 Dim temp_tbResultsWorksheet As String       'Data will be written here from resutls of query
 Dim temp_tbUploadWorksheet As String        'Data will be uploaded from this worksheet

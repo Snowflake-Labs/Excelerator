@@ -202,6 +202,9 @@ Function createStage(ByRef stageName As String)
     End If
     Exit Function
 ErrorHandlerCreateStage:
+    If err = giSuppressErrorMessage Then
+        err.Raise giSuppressErrorMessage
+    End If
     Call Utils.handleError("Unable to create stage. Check to see if role has proper privilege. ", err)
     err.Raise giSuppressErrorMessage
 ErrorHandlerRemoveFileFromStage:

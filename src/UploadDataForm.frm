@@ -14,11 +14,6 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
-
-
-
-
-
 Dim sKeyExample As String
 Dim bValidMergKeys As Boolean
 Dim bShowMergKeyMessage As Boolean

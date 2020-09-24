@@ -78,11 +78,14 @@ Sub setDownloadDateTime()
     'Sets the date the sheet downloaded data. Used to check if data has changed when uploading
     'Dim lockRangeTableDate As range
     Dim currentTimeSQL As String
+    On Error GoTo ErrorHandlerIgnoreError
     'Initialize Table locking Date range
     'Set lockRangeTableDate = FormCommon.initializeRange("LockTableDate")
     currentTimeSQL = "select to_char(current_Timestamp,'YYYY-MM-DD HH24:MI:SS.FF')"
     'lockRangeTableDate = Format(Utils.execSQLSingleValueOnly(currentTimeSQL), "YYYY-MM-DD HH24:Mmm:SS")
     FormCommon.initializeRange("LockTableDate") = Format(Utils.execSQLSingleValueOnly(currentTimeSQL), "YYYY-MM-DD HH24:Mmm:SS")
+ErrorHandlerIgnoreError:
+    'Do nothing
 End Sub
 
 Function getDownloadDateTime()
