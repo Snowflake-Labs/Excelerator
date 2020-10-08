@@ -10,7 +10,8 @@ Example use-cases include:
 * pricing analysis,
 * and more!
 
-Excelerator is not a supported product by Snowflake or any company. Excelerator will write data to the Snowflake database and should be used with great care. Use at your own risk.
+| :exclamation:        | Excelerator is not a supported product by Snowflake or any company. Excelerator will write data to the Snowflake database and should be used with great care. Use at your own risk.     |
+|---------------|:------------------------|
 
 ## Get Started with Excelerator
 Important: When following the instructions below, make sure to 'Unblock' the Addin after downloading. The details are in the link located in Step 3 below.
