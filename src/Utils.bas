@@ -27,7 +27,7 @@ Function ConnectionStringDSNLess()
 
     ConnectionStringDSNLess = connectionType & "driver={SnowflakeDSIIDriver};server=" & LoginForm.tbServer & ";database=" & _
        CustomRange(sgRangeDefaultDatabase) & ";schema=" & CustomRange(sgRangeDefaultSchema) & ";warehouse=" & CustomRange(sgRangeWarehouse) & ";role=" & _
-       CustomRange(sgRangeRole) & ";Uid=" & LoginForm.tbUserID & ";CLIENT_SESSION_KEEP_ALIVE=true;login_timeout=10;QUERY_TAG=Excelerator;"
+       CustomRange(sgRangeRole) & ";Uid=" & LoginForm.tbUserID & ";"
 
     If LoginForm.rbSSO Then
         ConnectionStringDSNLess = ConnectionStringDSNLess & "Authenticator=externalbrowser;"
@@ -115,7 +115,7 @@ Function openLogin()
         mdConnections.Add key:=ActiveWorkbook.name, Item:=mDBConnection
         If Not bSecondPass Then ' this is to make sure there is no infinite recursion
             bSecondPass = True
-            Call Utils.SetDateInputFormat
+            Call Utils.SetSessionParameters
             bSecondPass = False
         End If
         Dim checkDatabase As String
@@ -559,10 +559,15 @@ HandleworksheetNotExist:
 
 End Sub
 
-Sub SetDateInputFormat()
-    Utils.execSQLFireAndForget ("alter session set DATE_INPUT_FORMAT = '" & Utils.CustomRange(sgRangeDateInputFormat) & _
+Sub SetSessionParameters()
+    On Error GoTo ErrorHandlerSetSessionParams
+    Utils.execSQLFireAndForget ("alter session set  QUERY_TAG=Excelerator," & _
+    " DATE_INPUT_FORMAT = '" & Utils.CustomRange(sgRangeDateInputFormat) & _
      "', TIMESTAMP_INPUT_FORMAT = '" & Utils.CustomRange(sgRangeTimestampInputFormat) & _
      "', TIME_INPUT_FORMAT = '" & Utils.CustomRange(sgRangeTimeInputFormat) & "'")
+     Exit Sub
+ErrorHandlerSetSessionParams:
+     MsgBox ("Error occured setting session parameters. Non-Fatal error: " & err.Description)
 End Sub
 
 
