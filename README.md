@@ -30,15 +30,7 @@ Once downloaded, install the driver.
 
 ## Install Excelerator
 
-To begin, clone or download this repository to get your own copy of all the files.
-    
-### Step 1 (optional): Create Stored Procedures in Snowflake
-
-This step is only needed to enable the "Data Type Auto-generation" feature when adding a new table or column. Without the stored procedures, you'll have to define the data types for each new column.
-
-If you have access to the Snowflake web interface and a role with elevated privileges such as "ACCOUNTADMIN", you can run `SnowflakeExcelAdd-In_Stored_Procedures.sql`.  If you don't have access, then contact your Snowflake DBA and have them run the script for you.  This script will need to be run in the same database that you login into with the Excel Add-In, which we discuss below.
-
-### Step 2: Set Required Privileges
+### Step 1: Set Required Privileges
 
 Below are the privileges required for each capability.
 
@@ -64,19 +56,12 @@ To **rollback** data requires the schema privileges from upload, plus:
 |------------|---------------|
 | Table      | Ownership     |
   
-    
-For advanced features: Auto-generate Data Types
-
-* usage on all procedures
-* usage on future procedures
-* usage on all functions
-* usage on future functions
 
 Optional
 The following script will create a new role with the proper privileges, except the table level privileges: `SnowflakeExcelAdd-In_Create_Role.sql` 
 You’ll have to update the script before executing it with the information specific to your environment. In the script, you will be providing the role of the user that will be using this Add-In. The script will assign the new to the existing role, which will inherit all the privileges defined in the script.
 
-### Step 3 – Install Excel Add-in
+### Step 2 – Install Excel Add-in
 
 There are 2 versions of the Excel Add-in, one for only reading data from Snowflake and one for reading and writing data to snowflake. The Excel Add-ins are Excel files with an extension of ".xlam". The .xlam file for the read-only version is called "SnowflakeExcelAdd-InReadOnly.xlam". The full read-write version is called "SnowflakeExcelAdd-In.xlam". These files are both stored in the repository. In order to install these add-ins, follow the instructions here: https://exceloffthegrid.com/install-uninstall-excel-add/. 
 
@@ -97,10 +82,8 @@ Click the `connect` button and enter your Snowflake connection information.  The
 
 ![](images/image5.png)
 
-In the `Role` field, add the role that you entered into the script in Step 3.
-
-| :exclamation:        | The login database and schema specified in the connection must be the same database and schema the Stored Procs were run under     |
-|---------------|:------------------------|
+The user's default role and warehouse will be used. If the user does not have a default warehouse, they will be prompted to enter one.
+Both the role and warehouse can be changed by clicking on the 'Config' menu item in the Excel ribbon.
 
 ### Overview
 
@@ -123,7 +106,7 @@ Repeat as-needed to gather data from Snowflake into your Excel sheet.
 
 To write data to Snowflake, click the "Upload" button in the ribbon.
 
-![](images/image8.jpg)
+![](images/image8.png)
 
 #### Select Upload Table
 In the top section, choose the database, schema and table to upload the data to.
@@ -140,12 +123,11 @@ With any of the above options, if a column exists in the spreadsheet, but does n
 
 #### "Advanced Options" section 
 This section allows more options:
-1 - Create a new table - This will create a new table with the columns specified in the first row.
-2 - Recreate and existing table - This will drop the table and recreate the table with the columns specified in the first row.
+* Create a new table - This will create a new table with the columns specified in the first row.
+* Recreate and existing table - This will drop the table and recreate the table with the columns specified in the first row.
 
-### Auto-generate Data Types 
-When creating a new table, recreating a table or adding new columns to an existing table, you have the option to define the data types manually or let Snowflake determine the data type based on the data in the columns. To use this feature, click the "Auto-generate data types" checkbox. In order to use the Auto-generate feature, the Snowflake Excel stored procedures must be installed in the database & schema that was entered in the connection dialog. 
-The data type can be manually specified by clicking the "Define Data Types" button in the ribbon. A new row will be created in the first line of the spreadsheet containing a drop down of the Snowflake supported data types. Choose the appropriate data types for each column.
+### Specifying Data Types 
+For any new columns, the data type needs to be manually specified by clicking the "Define Data Types" button in the ribbon. A new row will be created in the first line of the spreadsheet containing a drop down of the Snowflake supported data types. Choose the appropriate data types for each column.
 
 ![](images/image9.jpg)
 

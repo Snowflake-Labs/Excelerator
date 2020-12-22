@@ -1,4 +1,6 @@
 /*
+  Important - These Stored Procedures are no longer needed. They will not be used by Excelerator.
+  
   Created July 2020 - Steve Segal
   These procs load and potentially create a table from a file in a stage
   If the table doesn't exist it will be Created. Any new columns will be added. 
