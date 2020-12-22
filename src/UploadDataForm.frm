@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} UploadDataForm 
    Caption         =   "Upload Data"
-   ClientHeight    =   7815
+   ClientHeight    =   6870
    ClientLeft      =   120
    ClientTop       =   465
    ClientWidth     =   5850
@@ -14,6 +14,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+
 Dim sKeyExample As String
 Dim bValidMergKeys As Boolean
 Dim bShowMergKeyMessage As Boolean
@@ -23,8 +24,6 @@ Dim uploadMergeKeysByLettersRange As range
 Dim uploadTypeRange As range
 Dim schemaComboboxInitialized As Boolean
 Dim bInitializing As Boolean
-
-
 
 Public Sub UserForm_Initialize()
     'Set uploadWorksheet = ActiveWorkbook.Sheets(CustomRange(sgRangeUploadWorksheet).value)

@@ -190,7 +190,12 @@ Function createStage(ByRef stageName As String)
         StatusForm.Update_Status ("Creating Stage...")
         'Generate random number for stagename
         randomNumber = Int(1 + Rnd * (1000)) * Second(Now())
-        stageName = "ExcelStage_" & Replace(fileName, ".", "_") & randomNumber
+        'Don't need this anymore since we are not using a default DB and Schema
+        'stageName = "ExcelStage_" & Replace(fileName, ".", "_") & randomNumber
+        
+        'This creates the stage in the same database as the table since the table is fully qualified
+        'Have to remove the last character from the table name since its a quote ", Then add is back at the end of the stageName
+        stageName = Left(tableName, Len(tableName) - 1) & "ExcelStage_" & randomNumber & """"
         sqlString = "create or replace stage " & stageName & " file_format = (type=csv, SKIP_HEADER=0,FIELD_OPTIONALLY_ENCLOSED_BY = '""')"
         Call Utils.execSQLFireAndForget(sqlString)
         createStage = True

@@ -6,6 +6,12 @@ Sub OpenUploadDataFormFromRibbon(control As IRibbonControl)
 
     If Not worksheetBelongsToAddin Then
         If Utils.login Then
+            If Utils.CustomRange(sgRangeWarehouse) = "" Then
+                Call SetRoleAndWarehouseForm.ShowMe(True)
+                If Utils.CustomRange(sgRangeWarehouse) = "" Then
+                    Exit Sub
+                End If
+            End If
             Set StatusForm = Nothing
             Call StatusForm.execMethod("Load", "OpenUploadDataForm")
         Else
@@ -40,6 +46,12 @@ Sub ExecuteSelectAllFromTableFromRibbon(control As IRibbonControl)
         Exit Sub
     End If
     If Utils.login Then
+        If Utils.CustomRange(sgRangeWarehouse) = "" Then
+            Call SetRoleAndWarehouseForm.ShowMe(True)
+            If Utils.CustomRange(sgRangeWarehouse) = "" Then
+                Exit Sub
+            End If
+        End If
         Set StatusForm = Nothing
         Call StatusForm.execMethod("Query", "ExecuteSelectAllFromUploadTable")
     End If
@@ -51,6 +63,12 @@ Sub OpenSQLFormFromRibbon(control As IRibbonControl)
     ' If this is one of the Addins worksheet don't allow because you don't want to overwrite it
     If Not worksheetBelongsToAddin Then
         If Utils.login Then
+            If Utils.CustomRange(sgRangeWarehouse) = "" Then
+                Call SetRoleAndWarehouseForm.ShowMe(True)
+                If Utils.CustomRange(sgRangeWarehouse) = "" Then
+                    Exit Sub
+                End If
+            End If
             Set StatusForm = Nothing
             Call StatusForm.execMethod("Query", "OpenSQLForm")
         End If

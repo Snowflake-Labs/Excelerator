@@ -26,8 +26,8 @@ Function ConnectionStringDSNLess()
     Dim dateInputFormat As String
 
     ConnectionStringDSNLess = connectionType & "driver={SnowflakeDSIIDriver};server=" & LoginForm.tbServer & ";database=" & _
-       LoginForm.tbDatabase & ";schema=" & LoginForm.tbSchema & ";warehouse=" & LoginForm.tbWarehouse & ";role=" & _
-       LoginForm.tbRole & ";Uid=" & LoginForm.tbUserID & ";CLIENT_SESSION_KEEP_ALIVE=true;login_timeout=10;"
+       CustomRange(sgRangeDefaultDatabase) & ";schema=" & CustomRange(sgRangeDefaultSchema) & ";warehouse=" & CustomRange(sgRangeWarehouse) & ";role=" & _
+       CustomRange(sgRangeRole) & ";Uid=" & LoginForm.tbUserID & ";CLIENT_SESSION_KEEP_ALIVE=true;login_timeout=10;QUERY_TAG=Excelerator;"
 
     If LoginForm.rbSSO Then
         ConnectionStringDSNLess = ConnectionStringDSNLess & "Authenticator=externalbrowser;"
@@ -38,8 +38,8 @@ Function ConnectionStringDSNLess()
             ConnectionStringDSNLess = ConnectionStringDSNLess & "passcode=" & LoginForm.tbPasscode & ";"
         End If
     End If
-    msConnectionStatus = "Server: " & LoginForm.tbServer & "    Database: " & LoginForm.tbDatabase & "    Schema: " & LoginForm.tbSchema & _
-        "    Warehouse: " & LoginForm.tbWarehouse & "    User: " & LoginForm.tbUserID & "    Role: " & LoginForm.tbRole
+    msConnectionStatus = "Server: " & LoginForm.tbServer & "    Database: " & CustomRange(sgRangeDefaultDatabase) & "    Schema: " & CustomRange(sgRangeDefaultSchema) & _
+        "    Warehouse: " & CustomRange(sgRangeWarehouse) & "    User: " & LoginForm.tbUserID & "    Role: " & CustomRange(sgRangeRole)
 
     ' Consider this: "CLIENT_SESSION_KEEP_ALIVE", "true"  If not the token expires in 4 hours
 End Function
@@ -121,27 +121,7 @@ Function openLogin()
         Dim checkDatabase As String
         Dim checkSchema As String
         bEverythingOKWithConncetion = True
-        'Check if warehous, DB ans schema are valid
-        sql = "select IFNULL(current_warehouse(),'') ||','|| IFNULL(current_database(),'') ||','|| IFNULL(current_schema(),'')"
-        dbObjsString = execSQLSingleValueOnly(sql)
-        arrDBObjs = Split(dbObjsString, ",")
-        If arrDBObjs(0) = "" Then
-            MsgBox ("The use does not have a valid warehouse. " & _
-           "Please specify one and login again.")
-            bEverythingOKWithConncetion = False
-        Else
-            If arrDBObjs(1) = "" Then
-                MsgBox ("The database entered does not exist or the user does not have access to it. " & _
-                "If the database name is in mixed case then use double quotes.")
-                bEverythingOKWithConncetion = False
-            Else
-                If arrDBObjs(2) = "" Then
-                    MsgBox ("The schema entered does not exist or the user does not have access to it " & _
-                    "If the schema name is in mixed case then use double quotes.")
-                    bEverythingOKWithConncetion = False
-                End If
-            End If
-        End If
+        SetRoleAndWarehouseForm.ShowMe (False) 'the False param allows the proc to check if the warehouse is empty first. It only opens if empty
     Loop
     Set openLogin = mDBConnection
     Exit Function

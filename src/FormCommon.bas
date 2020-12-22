@@ -150,6 +150,43 @@ Function initializeRange(field As String)
     End Select
     Set initializeRange = Utils.getOrCreateRange(wsWorkbookParams, Prefix & ActiveSheet.CodeName, igAllSingleValueRages_ColNumber)
 End Function
+Public Sub getRolesCombobox(ByRef cbRoles As comboBox)
+Dim arrRoles As Variant
+    Dim sql As String
+    Call StatusForm.Update_Status("Getting Roles...")
+    cbRoles.Clear
+    sql = "show grants to user " & CustomRange(sgRangeUserID)
+    Utils.execSQLFireAndForget (sql)
+    sql = "WITH roles (name) as (select $2 from table(result_scan(last_query_id())))  " & _
+            "select name from roles"
+    arrRoles = Utils.execSQLToArray(sql)
+    On Error GoTo ErrorHandlerNoRoles
+    For i = LBound(arrRoles) To UBound(arrRoles, 2)
+        cbRoles.AddItem (arrRoles(0, i))
+    Next i
+    Exit Sub
+ErrorHandlerNoRoles:
+    cbRoles.AddItem ("PUBLIC")
+End Sub
+Public Sub getWarehousesCombobox(ByRef cbWarehouses As comboBox)
+    Dim sql As String
+    Dim arrWarehouses As Variant
+    Call StatusForm.Update_Status("Getting Warehouses...")
+    cbWarehouses.Clear
+    On Error GoTo ErrorHandlerGetWarehouses
+    sql = "show warehouses"
+    Utils.execSQLFireAndForget (sql)
+    sql = "WITH warehouses (name) as (select $1 from table(result_scan(last_query_id()))) " & _
+            "select name from warehouses"
+    arrWarehouses = Utils.execSQLToArray(sql)
+
+    For i = LBound(arrWarehouses) To UBound(arrWarehouses, 2)
+        cbWarehouses.AddItem (arrWarehouses(0, i))
+    Next i
+    Exit Sub
+ErrorHandlerGetWarehouses:
+    
+End Sub
 
 Sub getTablesCombobox(ByRef cbTables As comboBox, database As String, schema As String)
     Dim sql As String
@@ -274,4 +311,10 @@ Public Function getColumnArray(database As String, schema As String, table As St
         dictColumns.Add Item:=getColumnArray, key:=key
     End If
 End Function
+
+Public Sub SetRoleAndWarehouseFormInit()
+    SetRoleAndWarehouseForm.UserForm_InitializeCustom
+   
+End Sub
+
 
