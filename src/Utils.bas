@@ -631,4 +631,8 @@ Function doesWorksheetExist()
     doesWorksheetExist = True
 End Function
 
-
+Sub SetDateInputFormat()
+    Utils.execSQLFireAndForget ("alter session set DATE_INPUT_FORMAT = '" & Utils.CustomRange(sgRangeDateInputFormat) & _
+     "', TIMESTAMP_INPUT_FORMAT = '" & Utils.CustomRange(sgRangeTimestampInputFormat) & _
+     "', TIME_INPUT_FORMAT = '" & Utils.CustomRange(sgRangeTimeInputFormat) & "'")
+End Sub

@@ -155,6 +155,7 @@ Dim arrRoles As Variant
     Dim sql As String
     Call StatusForm.Update_Status("Getting Roles...")
     cbRoles.Clear
+    On Error GoTo ErrorHandlerGettingGrants
     sql = "show grants to user " & CustomRange(sgRangeUserID)
     Utils.execSQLFireAndForget (sql)
     sql = "WITH roles (name) as (select $2 from table(result_scan(last_query_id())))  " & _
@@ -167,6 +168,11 @@ Dim arrRoles As Variant
     Exit Sub
 ErrorHandlerNoRoles:
     cbRoles.AddItem ("PUBLIC")
+    Exit Sub
+ErrorHandlerGettingGrants:
+    MsgBox ("Error getting grants for user " & CustomRange(sgRangeUserID) & ". " & err.Description)
+    StatusForm.Hide
+    err.Raise giCancelEvent
 End Sub
 Public Sub getWarehousesCombobox(ByRef cbWarehouses As comboBox)
     Dim sql As String

@@ -64,10 +64,6 @@ Private Sub setCancelVariables()
 End Sub
 
 Private Sub OKButton_Click()
-    If rbUserPass And Len(Trim(tbPassword)) = 0 Then
-        MsgBox "Password is mandatory."
-        Exit Sub
-    End If
     If Len(Trim(tbLogWorksheet)) = 0 Or Len(Trim(tbWindowsTempDirectory)) = 0 Then
         MsgBox "Log Worksheet and Windows Temp director are mandatory."
         Exit Sub

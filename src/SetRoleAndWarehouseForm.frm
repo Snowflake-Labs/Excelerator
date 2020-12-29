@@ -14,11 +14,14 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Dim bInitializing As Boolean
+Dim bInitializationError As Boolean
 Dim startingRole As String
 Dim startingWarehouse As String
 
+
 Public Sub ShowMe(bForceOpen As Boolean)
     Dim sql As String
+    bInitializationError = False
     'Need to check to see if we haven't already called this. It could happen when a use isn't logged in and they go to Configs and then open Roles & Warehouses
     If Not bInitializing Then
         bInitializing = True
@@ -36,7 +39,7 @@ Public Sub ShowMe(bForceOpen As Boolean)
         If bForceOpen Or startingRole = "" Or startingWarehouse = "" Then
             ' This calls the FormCommon.SetRoleAndWarehouseFormInit which calls the UserForm_InitializeCustom Sub below. It allows the progress window to open
             Call StatusForm.execMethod("FormCommon", "SetRoleAndWarehouseFormInit")
-            If startingWarehouse <> "" Then
+            If startingWarehouse <> "" And Not bInitializationError Then
                 Me.Show
             End If
         End If
@@ -49,6 +52,7 @@ Public Sub UserForm_InitializeCustom()
     If startingWarehouse = "" Then
         startingWarehouse = getManaullyEnteredWarehouse()
     End If
+    'If there is still no valid warehouse then exit
     If startingWarehouse = "" Then
         StatusForm.Hide
         Exit Sub
@@ -62,9 +66,11 @@ Public Sub UserForm_InitializeCustom()
     StatusForm.Hide
     Exit Sub
 ErrorHandlerInitialization:
-    MsgBox "ERROR: Problem initializing: " & errMsg
+    If err.Number <> giCancelEvent Then
+        MsgBox "ERROR: Problem initializing: " & err.Description
+    End If
     bInitializing = False
-    Exit Sub
+    bInitializationError = True
 End Sub
 
 Sub getWarehouses(cbWarehouses As comboBox)
