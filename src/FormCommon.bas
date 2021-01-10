@@ -323,4 +323,10 @@ Public Sub SetRoleAndWarehouseFormInit()
    
 End Sub
 
-
+Public Sub setUserFormPosition(ByRef form As Object)
+'This centers the window within Excel. Helpful for dual monitors
+  form.StartUpPosition = 0
+  form.Left = Application.Left + (0.5 * Application.Width) - (0.5 * form.Width)
+  form.Top = Application.Top + (0.5 * Application.Height) - (0.5 * form.Height)
+  
+End Sub

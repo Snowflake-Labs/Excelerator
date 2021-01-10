@@ -23,6 +23,8 @@ Private Sub btCancel_Click()
 End Sub
 
 Private Sub UserForm_Initialize()
+    'Center window in Excel
+    Call FormCommon.setUserFormPosition(Me)
     selectedColumnsCSV = ""
 End Sub
 
