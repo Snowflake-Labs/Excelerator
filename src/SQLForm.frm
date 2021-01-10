@@ -86,12 +86,11 @@ Private Sub UserForm_Activate()
 End Sub
 
 Private Sub UserForm_Initialize()
- 
+
     Dim sqlRangeLastExecutedIndex_Name As String
     Dim sqlRangeLastExectedSQL_Name As String
     StatusForm.Update_Status ("Preparing SQL Form...")
-    'Center window in Excel
-    Call FormCommon.setUserFormPosition(Me)
+
     Set wsWorkbookParams = Utils.getWorksheet(gsSnowflakeWorkbookParamWorksheetName)
 
     emptySQLMessage = "Please enter SQL..."

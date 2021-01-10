@@ -26,8 +26,6 @@ Private Sub btClose_Click()
 End Sub
 
 Private Sub UserForm_Initialize()
-    'Center window in Excel
-    Call FormCommon.setUserFormPosition(Me)
     Update_Status ("Preparing...")
 End Sub
 

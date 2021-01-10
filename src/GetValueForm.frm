@@ -49,8 +49,3 @@ End Sub
 Public Function okClicked()
     okClicked = bOKClicked
 End Function
-
-Private Sub UserForm_Initialize()
-    'Center window in Excel
-    Call FormCommon.setUserFormPosition(Me)
-End Sub

@@ -45,8 +45,6 @@ Private Sub lblUserWarehouse_Click()
 End Sub
 
 Private Sub UserForm_Initialize()
-    'Center window in Excel
-    Call FormCommon.setUserFormPosition(Me)
     'set variables to rollback if cancelled
     Call setCancelVariables
     sWorkbookVers = gWorkbookVers
