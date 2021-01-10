@@ -30,6 +30,8 @@ Public Sub UserForm_Initialize()
     '  Dim uploadMergeKeysRange_Name As String
     Dim uploadMergeKeysByLettersRange_Name As String
     Dim uploadMergeKeysRange_Name As String
+    'Center window in Excel
+    Call FormCommon.setUserFormPosition(Me)
     StatusForm.Update_Status ("Preparing Upload Form...")
     Set wsWorkbookParams = Utils.getWorksheet(gsSnowflakeWorkbookParamWorksheetName)
     If CustomRange(sgRangeUploadWorksheet) <> "" Then
