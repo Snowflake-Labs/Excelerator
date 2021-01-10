@@ -141,6 +141,12 @@ Private Sub btCancel_Click()
     Me.Hide
     Set SetRoleAndWarehouseForm = Nothing
 End Sub
+
+Private Sub UserForm_Initialize()
+    'Center window in Excel
+    Call FormCommon.setUserFormPosition(Me)
+End Sub
+
 Private Sub UserForm_QueryClose(Cancel As Integer, CloseMode As Integer)
     btCancel_Click
 End Sub

@@ -68,6 +68,8 @@ Private Sub tbServer_Enter()
 End Sub
 
 Private Sub UserForm_Initialize()
+    'Center window in Excel
+    Call FormCommon.setUserFormPosition(Me)
     'to rollback if cancelled
     Call setCancelVariables
     'remove all empty ranges. Doing it here because there is no other great place
