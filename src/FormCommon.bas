@@ -153,10 +153,16 @@ End Function
 Public Sub getRolesCombobox(ByRef cbRoles As comboBox)
 Dim arrRoles As Variant
     Dim sql As String
+    Dim UserName As String
+    
     Call StatusForm.Update_Status("Getting Roles...")
     cbRoles.Clear
     On Error GoTo ErrorHandlerGettingGrants
-    sql = "show grants to user " & CustomRange(sgRangeUserID)
+    'Get user name. Can't use the one to login because I need the proper case
+    sql = "select CURRENT_USER()"
+    UserName = execSQLSingleValueOnly(sql)
+    
+    sql = "show grants to user """ & UserName & """"
     Utils.execSQLFireAndForget (sql)
     sql = "WITH roles (name) as (select $2 from table(result_scan(last_query_id())))  " & _
             "select name from roles"
