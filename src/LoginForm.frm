@@ -14,6 +14,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+
 'For cancel values
 Dim temp_tbUserID As String
 Dim temp_tbServer As String
@@ -32,12 +33,14 @@ Private Sub rbSSO_Click()
     gsAuthenticationType = "SSO"
     CustomRange(sgRangeAuthType) = "SSO"
     tbPassword.Enabled = False
+    lblPassword.Enabled = False
 End Sub
 
 Private Sub rbUserPass_Click()
     gsAuthenticationType = "UserPass"
     CustomRange(sgRangeAuthType) = "User & Pass"
     tbPassword.Enabled = True
+    lblPassword.Enabled = True
 End Sub
 
 Private Sub setCancelVariables()
@@ -77,6 +80,7 @@ Private Sub UserForm_Initialize()
     If temp_authType = "SSO" Then
         rbSSO = True
         tbPassword.Enabled = False
+        lblPassword.Enabled = False
     Else
         rbUserPass = True
         tbPassword.SetFocus
@@ -129,6 +133,7 @@ Private Sub CancelButton_Click()
     If temp_authType = "SSO" Then
         rbSSO = True
         tbPassword.Enabled = False
+        lblPassword.Enabled = False
     Else
         rbUserPass = True
         tbPassword.SetFocus

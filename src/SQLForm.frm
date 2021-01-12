@@ -14,6 +14,7 @@ Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 
+
 Dim sqlRange As range
 Dim sqlRangeName As range
 Dim sqlRangeSQL As range

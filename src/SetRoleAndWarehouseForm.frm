@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} SetRoleAndWarehouseForm 
    Caption         =   "Select Role & Warehouse"
-   ClientHeight    =   1845
+   ClientHeight    =   1995
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   5370
+   ClientWidth     =   5055
    OleObjectBlob   =   "SetRoleAndWarehouseForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -13,11 +13,12 @@ Attribute VB_GlobalNameSpace = False
 Attribute VB_Creatable = False
 Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
+
 Dim bInitializing As Boolean
 Dim bInitializationError As Boolean
 Dim startingRole As String
 Dim startingWarehouse As String
-
+Dim curretUser As String
 
 Public Sub ShowMe(bForceOpen As Boolean)
     Dim sql As String
@@ -26,13 +27,14 @@ Public Sub ShowMe(bForceOpen As Boolean)
     If Not bInitializing Then
         bInitializing = True
         'Get warehouse and Role - This also makes sure we are logged in
-        sql = "select IFNULL(current_role(),'') ||','|| IFNULL(current_warehouse(),'') ||','|| IFNULL(current_database(),'') ||','|| IFNULL(current_schema(),'')"
+        sql = "select IFNULL(current_role(),'') ||','|| IFNULL(current_warehouse(),'') ||','|| CURRENT_USER() ||','|| IFNULL(current_database(),'') ||','|| IFNULL(current_schema(),'')"
         dbObjsString = execSQLSingleValueOnly(sql)
         
         'split up result string into array
         arrDBObjs = Split(dbObjsString, ",")
         startingRole = arrDBObjs(0)
         startingWarehouse = arrDBObjs(1)
+        curretUser = arrDBObjs(2)
         'persist the warehouse and role
         Utils.CustomRange(sgRangeWarehouse) = startingWarehouse
         Utils.CustomRange(sgRangeRole) = startingRole
@@ -98,15 +100,14 @@ End Sub
 
 Sub getRoles(cbRoles As comboBox)
     'populate Roles Combobox
-    Call FormCommon.getRolesCombobox(cbRoles)
+    Call FormCommon.getRolesCombobox(cbRoles, curretUser)
     ' Select Role from list
     index = FormCommon.indexOfValueInList(cbRoles, startingRole)
     If index > -1 Then
         cbRoles.ListIndex = index
     Else
-        If cbRoles.ListCount > 0 Then
-            cbRoles.ListIndex = 0
-        End If
+        cbRoles.AddItem (startingRole)
+        cbRoles.ListIndex = FormCommon.indexOfValueInList(cbRoles, startingRole)
     End If
 End Sub
 
@@ -140,6 +141,34 @@ Private Sub btCancel_Click()
     End If
     Me.Hide
     Set SetRoleAndWarehouseForm = Nothing
+End Sub
+
+Private Sub btEnterRole_Click()
+    Dim manuallyEnteredRole As String
+    Set GetValueForm = Nothing
+    GetValueForm.setMessage ("Enter Role")
+    GetValueForm.setValue ("")
+RequestRole:
+    GetValueForm.Show
+    If GetValueForm.okClicked Then
+        manuallyEnteredRole = UCase(GetValueForm.Getvalue())
+        On Error GoTo ErrorHandlerInvalidRole
+        Call Utils.execSQLFireAndForget("use role " & manuallyEnteredRole)
+        ' if we got this far then the role is valid
+        index = FormCommon.indexOfValueInList(cbRoles, manuallyEnteredRole)
+        If index > -1 Then
+            cbRoles.ListIndex = index
+        Else
+            cbRoles.AddItem (manuallyEnteredRole)
+            cbRoles.ListIndex = FormCommon.indexOfValueInList(cbRoles, manuallyEnteredRole)
+        End If
+        Call SetRoleAndWarehouseForm.getWarehouses(cbWarehouses)
+        Call FormCommon.dropDBObjectsCache
+    End If
+    Exit Sub
+ErrorHandlerInvalidRole:
+    MsgBox "The Role entered does not exist or user does not have access to it."
+    Resume RequestRole
 End Sub
 
 Private Sub UserForm_Initialize()

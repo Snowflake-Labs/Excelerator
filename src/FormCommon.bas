@@ -150,19 +150,15 @@ Function initializeRange(field As String)
     End Select
     Set initializeRange = Utils.getOrCreateRange(wsWorkbookParams, Prefix & ActiveSheet.CodeName, igAllSingleValueRages_ColNumber)
 End Function
-Public Sub getRolesCombobox(ByRef cbRoles As comboBox)
+Public Sub getRolesCombobox(ByRef cbRoles As comboBox, CurrentUser As String)
 Dim arrRoles As Variant
     Dim sql As String
-    Dim UserName As String
     
     Call StatusForm.Update_Status("Getting Roles...")
     cbRoles.Clear
     On Error GoTo ErrorHandlerGettingGrants
-    'Get user name. Can't use the one to login because I need the proper case
-    sql = "select CURRENT_USER()"
-    UserName = execSQLSingleValueOnly(sql)
     
-    sql = "show grants to user """ & UserName & """"
+    sql = "show grants to user """ & CurrentUser & """"
     Utils.execSQLFireAndForget (sql)
     sql = "WITH roles (name) as (select $2 from table(result_scan(last_query_id())))  " & _
             "select name from roles"
@@ -171,6 +167,7 @@ Dim arrRoles As Variant
     For i = LBound(arrRoles) To UBound(arrRoles, 2)
         cbRoles.AddItem (arrRoles(0, i))
     Next i
+    cbRoles.AddItem ("PUBLIC")
     Exit Sub
 ErrorHandlerNoRoles:
     cbRoles.AddItem ("PUBLIC")
