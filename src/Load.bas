@@ -395,7 +395,9 @@ Sub SaveWorksheet(ws As Worksheet, fileName As String)
     ws.Copy
     Set wb = Workbooks(ActiveWorkbook.name)
     Application.DisplayAlerts = False
-    wb.SaveAs fileName:=fileName, FileFormat:=xlCSV, CreateBackup:=False
+    'wb.SaveAs fileName:=fileName, FileFormat:=xlCSV, CreateBackup:=False
+    wb.SaveAs fileName:=fileName, FileFormat:=xlCSVUTF8, CreateBackup:=False
+    
     Debug.Print ("Active Workbook:" & ActiveWorkbook.name)
 
     wb.Close
