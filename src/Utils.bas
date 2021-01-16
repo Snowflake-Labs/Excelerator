@@ -636,3 +636,7 @@ Sub SetDateInputFormat()
      "', TIMESTAMP_INPUT_FORMAT = '" & Utils.CustomRange(sgRangeTimestampInputFormat) & _
      "', TIME_INPUT_FORMAT = '" & Utils.CustomRange(sgRangeTimeInputFormat) & "'")
 End Sub
+
+Sub setDefaultDBandSchema(dbAndSchema As String)
+    Utils.execSQLFireAndForget ("use schema " & dbAndSchema)
+End Sub

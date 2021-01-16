@@ -222,7 +222,10 @@ Sub copyDataLocal(copyType As String)
     If copyType = "MergeLocal" Then
         On Error GoTo ErrorHandlerAlterStage
         'Changing the skip _header is only needed on the merge becuse it is built into the 'copy' sql
-        sqlFileFormatSkipHeader = "alter stage " & stageName & " set FILE_FORMAT = (FIELD_OPTIONALLY_ENCLOSED_BY = '""', SKIP_HEADER=" & iHeaderRow & ")"
+        'Example of using ENCODING = 'windows-1252'
+        'sqlFileFormatSkipHeader = "alter stage " & stageName & " set FILE_FORMAT = (FIELD_OPTIONALLY_ENCLOSED_BY = '""', ENCODING = 'windows-1252', SKIP_HEADER=" & iHeaderRow & ")"
+        sqlFileFormatSkipHeader = "alter stage " & stageName & " set FILE_FORMAT = (FIELD_OPTIONALLY_ENCLOSED_BY = '""',  SKIP_HEADER=" & iHeaderRow & ")"
+        Call Utils.execSQLFireAndForget(sqlFileFormatSkipHeader)
         Call Utils.execSQLFireAndForget(sqlFileFormatSkipHeader)
         sqlString = createMergeSQL
     Else
@@ -392,17 +395,64 @@ End Function
 
 Sub SaveWorksheet(ws As Worksheet, fileName As String)
     Dim wb As Workbook
+    Dim sFileFormat As String
     ws.Copy
     Set wb = Workbooks(ActiveWorkbook.name)
     Application.DisplayAlerts = False
-    'wb.SaveAs fileName:=fileName, FileFormat:=xlCSV, CreateBackup:=False
-    wb.SaveAs fileName:=fileName, FileFormat:=xlCSVUTF8, CreateBackup:=False
     
-    Debug.Print ("Active Workbook:" & ActiveWorkbook.name)
-
+    On Error GoTo ErrorHandlerSaveWorkbook
+    'This will only work on Excel 2016 and above. If it errors then the handler will export another way
+    If Application.Version >= 16 Then
+        sFileFormat = xlCSVUTF8
+    Else
+        sFileFormat = xlCSV ' I will need to handle non-UTF8 encodings separatly
+    End If
+    wb.SaveAs fileName:=fileName, FileFormat:=sFileFormat, CreateBackup:=False
     wb.Close
     Application.DisplayAlerts = True
+    Exit Sub
+ErrorHandlerSaveWorkbook:
+    wb.Close
+    Application.DisplayAlerts = True
+    err.Raise (err.Number)
+    
+End Sub
 
+Sub CreateCSVinUTF8(fileName As String)
+'THis is not working properly becuase the data formats are not correct and string are not surrounded by quotes.
+    Dim ByteData()  As Byte
+    Dim FileSpec    As String
+    Dim Text        As String
+    Dim vaInput()   As Variant
+    Dim Wks         As Worksheet
+    
+    Const adCrLf                As Long = -1
+    Const adModeUnknown         As Long = 0
+    Const adSaveCreateOverWrite As Long = 2
+    Const adTypeText            As Long = 2
+        
+    Set Wks = ActiveSheet
+    vaInput = Wks.UsedRange
+        
+    Set st = CreateObject("ADODB.Stream")
+    With st
+        .Mode = adModeUnknown
+        .Type = adTypeText
+        .LineSeparator = adCrLf
+        .Charset = "UTF-8"
+        .Open
+    End With
+    
+    For r = 1 To UBound(vaInput, 1)
+        For c = 1 To UBound(vaInput, 2)
+            Text = Text & vaInput(r, c) & ","
+        Next c
+        Text = Left(Text, Len(Text) - 1) & vbCrLf
+        st.WriteText Text
+        Text = ""
+    Next r
+    st.SaveToFile fileName, adSaveCreateOverWrite
+    st.Close
 End Sub
 
 Sub AddDataTypeDropDowns()
@@ -661,9 +711,10 @@ Function createClonedTableName(origTable As String)
     Dim tempTable As String
     'Remove the quotes
     tempTable = Replace(origTable, Chr(34), vbNullString, 1, 6)
-    Dim tableArr() As String
-    tableArr = Split(tempTable, ".")
-    tempTable = tableArr(UBound(tableArr))
+   'Removed this becuase there is not more default database, so we need to keep the fully qualified table name
+   ' Dim tableArr() As String
+   ' tableArr = Split(tempTable, ".")
+   ' tempTable = tableArr(UBound(tableArr))
 
     createClonedTableName = tempTable & (Int(1 + Rnd * (1000)) * Second(Now())) & "_BackupForExcel"
 
