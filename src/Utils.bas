@@ -493,8 +493,14 @@ Sub RemoveConnections()
 End Sub
 
 Sub OpenHelp(sSection As String)
-    MsgBox ("Help is on it's way! But it might take a while:(")
-    helpUrl = "https://www.snowflake.com/blog/"
+    Select Case sSection
+    Case "UseAsDefaultDB"
+        MsgBox "Sets the Snowflake default database and schema. " & _
+        vbNewLine & "Checking this allows you to write sql without fully qualifying the table with the database and schema.", vbOKOnly, "Help"
+    Case Else
+        MsgBox ("Help is on it's way! But it might take a while:(")
+        helpUrl = "https://www.snowflake.com/blog/"
+    End Select
     'ActiveWorkbook.FollowHyperlink Address:=helpUrl, NewWindow:=True
 End Sub
 

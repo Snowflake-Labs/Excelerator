@@ -20,6 +20,7 @@ Dim sqlRangeName As range
 Dim sqlRangeSQL As range
 Dim sqlRangeLastExecutedIndex As range
 Dim sqlRangeLastExecutedSQL As range
+Dim dbObjRangeUseAsDefaultDB As range
 
 Dim sqlRangeName_Name As String
 Dim sqlRangeSQL_Name As String
@@ -73,8 +74,6 @@ Private Sub cbSchemas_Click()
     End If
 End Sub
 
-
-
 Private Sub lblGotoSnowflake_Click()
     snowflakeURL = "https://" & Utils.CustomRange(sgRangeServer)
     ActiveWorkbook.FollowHyperlink Address:=snowflakeURL, NewWindow:=True
@@ -103,6 +102,10 @@ Private Sub UserForm_Initialize()
     ' Initialize DB Comboboxes
     bInitializing = True
     Call FormCommon.initializeDBObjectsComboBoxes(cbDatabases, cbSchemas, cbTables)
+    'Initialize default checkbox
+    Set dbObjRangeUseAsDefaultDB = FormCommon.initializeRange("UseAsDefaultDBCheckbox")
+    checkDefaultDB.value = dbObjRangeUseAsDefaultDB
+    
     bInitializing = False
     'Initialize Table locking ranges
     'lockRangeTableName = FormCommon.initializeRange("LockTableName")
@@ -323,7 +326,7 @@ Public Sub ExecuteButton_Click()
         Exit Sub
     End If
     If tbSQL = "" Or tbSQL = emptySQLMessage Then
-        MsgBox ("Please enter a SQL statement before executing.")
+        MsgBox "Please enter a SQL statement before executing."
         tbSQL = emptySQLMessage
         Exit Sub
     End If
@@ -331,6 +334,10 @@ Public Sub ExecuteButton_Click()
     Utils.SaveAllNamedRangesToAddIn
 
     Set StatusForm = Nothing
+    If checkDefaultDB Then
+        Utils.execSQLFireAndForget ("use schema " & cbDatabases & "." & cbSchemas)
+    End If
+    
     Call StatusForm.execMethod("Query", "ExecuteSQLFromNamedCell", tbSQL)
     'Check to see if anything was returned. If nothing then it could be an error so leave the window open
     If ActiveSheet.range(gsQueryResultsCell) = "" Then
@@ -348,6 +355,7 @@ Public Sub ExecuteButton_Click()
     End If
 
     Call FormCommon.saveDBObjectsValues(cbDatabases, cbSchemas, cbTables)
+    dbObjRangeUseAsDefaultDB = checkDefaultDB
 ErrorHandlerIgnoreError:
     'This is needed because this window can be opened multiple times beause of the Me.Show above
     'do nothing
@@ -361,6 +369,9 @@ End Sub
 
 Private Sub iHelpLink_Click()
     OpenHelp ("ConfigForm")
+End Sub
+Private Sub iHelpDefaultDB_Click()
+    OpenHelp ("UseAsDefaultDB")
 End Sub
 
 Private Sub UserForm_QueryClose(Cancel As Integer, CloseMode As Integer)

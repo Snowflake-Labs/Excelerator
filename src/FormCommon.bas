@@ -46,7 +46,7 @@ Sub initializeDBObjectsComboBoxes(ByRef cbDatabases As comboBox, ByRef cbSchemas
     Set dbObjRangeSelectedDB = FormCommon.initializeRange("DBCombobox")
     Set dbObjRangeSelectedSchema = FormCommon.initializeRange("SchemaCombobox")
     Set dbObjRangeSelectedTable = FormCommon.initializeRange("TableCombobox")
-
+    
     ' *********** databases Combobox  ****************
     Call FormCommon.getDatabasesCombobox(cbDatabases)
     If cbDatabases.ListCount = 0 Then
@@ -139,6 +139,8 @@ Function initializeRange(field As String)
             Prefix = sgDBObj_LastSelectedSchema_RangePrefix
         Case "TableCombobox"
             Prefix = sgDBObj_LastSelectedTable_RangePrefix
+        Case "UseAsDefaultDBCheckbox"
+            Prefix = sgDBObj_UseAsDefaultDbAndSchema_Checkbox_RangePrefix
         Case "LockTableDate"
             Prefix = sgLockedDownloadTableDateTime_RangePrefix
         Case "RollbackUploadDateTime"

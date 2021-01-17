@@ -1,7 +1,7 @@
 Attribute VB_Name = "Globals"
 ' When adding a new named range to the Config sheet, you should update the Build.setRangeDefaultValues sub to set the defaults
 'from Utils module
-Public Const gWorkbookVers As String = "1.1.6"                                ' This is just for information
+Public Const gWorkbookVers As String = "1.1.7"                                ' This is just for information
 Public Const gWorkbookSPCompatibilityVers As Integer = 2                    ' Used to ensure the proper Stored Procs are used
 Public Const gsQueryResultsCell As String = "A1"
 Public Const giStartingRowForUpload As Integer = 1
@@ -27,6 +27,7 @@ Public Const sgSavedSQL_SQL_RangePrefix As String = "sfSavedSQLSQL"
 Public Const sgDBObj_LastSelectedDB_RangePrefix As String = "sfDBObjLastDB"
 Public Const sgDBObj_LastSelectedSchema_RangePrefix As String = "sfDBObjLastSchema"
 Public Const sgDBObj_LastSelectedTable_RangePrefix As String = "sfDBObjLastTable"
+Public Const sgDBObj_UseAsDefaultDbAndSchema_Checkbox_RangePrefix As String = "sfDBObjUseAsDefaultDB"
 
 'For Table level optimistic locking
 Public Const sgLockedDownloadTableDateTime_RangePrefix As String = "sfLockedDownloadTableDate"
