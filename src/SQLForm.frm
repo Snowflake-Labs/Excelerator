@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} SQLForm 
    Caption         =   "Execute SQL"
-   ClientHeight    =   6720
+   ClientHeight    =   8580
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   8970
+   ClientWidth     =   9930
    OleObjectBlob   =   "SQLForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -73,6 +73,8 @@ Private Sub cbSchemas_Click()
     End If
 End Sub
 
+
+
 Private Sub lblGotoSnowflake_Click()
     snowflakeURL = "https://" & Utils.CustomRange(sgRangeServer)
     ActiveWorkbook.FollowHyperlink Address:=snowflakeURL, NewWindow:=True
@@ -80,10 +82,6 @@ End Sub
 
 Private Sub tbSQL_Enter()
     If tbSQL = emptySQLMessage Then tbSQL = ""
-End Sub
-
-Private Sub UserForm_Activate()
-    ' UserForm_Initialize
 End Sub
 
 Private Sub UserForm_Initialize()
@@ -116,10 +114,17 @@ Private Sub UserForm_Initialize()
     sqlRangeSQL_Name = sgSavedSQL_SQL_RangePrefix & sheetCode
     sqlRangeLastExecutedIndex_Name = sgSavedSQL_SelectedIndex_RangePrefix & sheetCode
     sqlRangeLastExectedSQL_Name = sgSavedSQL_LastExecutedSQL_RangePrefix & sheetCode
+    'get parameters
+    'sqlRangeParameterName_Name = sgSavedSQL_ParameterName_RangePrefix & sheetCode
+    'sqlRangeParameterValue_Name = sgSavedSQL_ParameterValue_RangePrefix & sheetCode
 
     On Error Resume Next
     Set sqlRangeName = Utils.CustomRange(sqlRangeName_Name)
     Set sqlRangeSQL = Utils.CustomRange(sqlRangeSQL_Name)
+    'Parameters
+   ' Set sqlRangeParameterNames = Utils.CustomRange(sqlRangeParameterName_Name)
+    'Set sqlRangeSQLParameterValues = Utils.CustomRange(sqlRangeParameterValue_Name)
+    
     cbSQLList.RowSource = sqlRangeName_Name
     On Error GoTo 0
     err.Clear
@@ -333,6 +338,7 @@ Public Sub ExecuteButton_Click()
     End If
     'This is a hack because after an excel table is created and the selected cell is in the table,
     'the ribbon changes tabs to the table, so this brings it back to the Home tab
+    On Error GoTo ErrorHandlerIgnoreError
     Utils.RibbonactivateHomeTab
     If cbSQLList.ListIndex > -1 Then
         sqlRangeLastExecutedIndex = cbSQLList.ListIndex     'lastSelectedSaveSQLIndex
@@ -342,6 +348,9 @@ Public Sub ExecuteButton_Click()
     End If
 
     Call FormCommon.saveDBObjectsValues(cbDatabases, cbSchemas, cbTables)
+ErrorHandlerIgnoreError:
+    'This is needed because this window can be opened multiple times beause of the Me.Show above
+    'do nothing
 End Sub
 
 Private Sub btExit_Click()

@@ -312,10 +312,13 @@ ErrorHandlerExecSQL:
         err.Raise giCancelEvent
     Else
         If InStr(1, err.Description, "Authentication token has expired") Then
-            MsgBox ("Session has expired. Please login again")
-            err.Raise giSuppressErrorMessage
+            Utils.Connect
+            err.Clear
+            Set rs = conn.Execute(sqlString)
+           ' MsgBox ("Session has expired. Please login again")
+           ' err.Raise giSuppressErrorMessage
         Else
-        'MsgBox ("Error exceuting SQL: " & err.Description)
+            MsgBox ("Error exceuting SQL: " & err.Description)
             err.Raise giSQLErrorEvent
         End If
     End If

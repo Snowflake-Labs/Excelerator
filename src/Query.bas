@@ -21,9 +21,25 @@ Sub ExecuteSQL(sqlString As String)
         'get the SQL to execute from the named cell = "SQL"
 
         Call Utils.RemoveQueryTables(queryResultWorksheet)
-
-        StatusForm.Update_Status ("Executing query...")
+        
+        'remove last char if it's a ;
+        If (Right(sqlString, 1) = ";") Then
+            sqlString = Left(sqlString, Len(sqlString) - 1)
+        End If
+        
         On Error GoTo ErrorHandlerExecSQL
+        Dim arrQueries() As String
+        arrQueries = Split(sqlString, ";")
+        For i = LBound(arrQueries) To UBound(arrQueries) - 1
+            If arrQueries(i) <> "" Then
+                StatusForm.Update_Status ("Executing query #" & i + 1 & "...")
+                Utils.execSQLFireAndForget (arrQueries(i))
+            End If
+        Next i
+        sqlString = arrQueries(i)
+        
+        StatusForm.Update_Status ("Executing query...")
+        
         Call Utils.ExecSQL(queryResultWorksheet, gsQueryResultsCell, sqlString)
         ' set download datetime
         Call Query.setDownloadDateTime
