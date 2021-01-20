@@ -401,11 +401,12 @@ Sub SaveWorksheet(ws As Worksheet, fileName As String)
     Application.DisplayAlerts = False
     
     On Error GoTo ErrorHandlerSaveWorkbook
-    'This will only work on Excel 2016 and above. If it errors then the handler will export another way
-    If Application.Version >= 16 Then
+    'This will only work on Excel version 16.0.7466.2023 and above. If it errors then the handler will export another way
+    'If Application.Version > "16.0" Or (Application.Version = "16.0" And Application.Build >= 7466) Then '16.0.7466.2023  For sure in 16.0.7726.1049
+    If xlCSVUTF8 = 62 Then
         sFileFormat = xlCSVUTF8
     Else
-        sFileFormat = xlCSV ' I will need to handle non-UTF8 encodings separatly
+        sFileFormat = xlCSV 'Non UTF8 characters are not supported yet
     End If
     wb.SaveAs fileName:=fileName, FileFormat:=sFileFormat, CreateBackup:=False
     wb.Close

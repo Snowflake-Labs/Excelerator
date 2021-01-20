@@ -312,11 +312,11 @@ ErrorHandlerExecSQL:
         err.Raise giCancelEvent
     Else
         If InStr(1, err.Description, "Authentication token has expired") Then
-            Utils.Connect
-            err.Clear
-            Set rs = conn.Execute(sqlString)
-           ' MsgBox ("Session has expired. Please login again")
-           ' err.Raise giSuppressErrorMessage
+            'Utils.Connect
+            'err.Clear
+            'Set rs = conn.Execute(sqlString)
+            MsgBox ("Session has expired. Please login again")
+            err.Raise giSuppressErrorMessage
         Else
             MsgBox ("Error exceuting SQL: " & err.Description)
             err.Raise giSQLErrorEvent
@@ -570,7 +570,7 @@ End Sub
 
 Sub SetSessionParameters()
     On Error GoTo ErrorHandlerSetSessionParams
-    Utils.execSQLFireAndForget ("alter session set  QUERY_TAG=Excelerator," & _
+    Utils.execSQLFireAndForget ("alter session set  CLIENT_SESSION_KEEP_ALIVE = true, QUERY_TAG=Excelerator," & _
     " DATE_INPUT_FORMAT = '" & Utils.CustomRange(sgRangeDateInputFormat) & _
      "', TIMESTAMP_INPUT_FORMAT = '" & Utils.CustomRange(sgRangeTimestampInputFormat) & _
      "', TIME_INPUT_FORMAT = '" & Utils.CustomRange(sgRangeTimeInputFormat) & "'")
