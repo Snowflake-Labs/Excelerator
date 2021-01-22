@@ -107,11 +107,13 @@ Private Sub UserForm_Initialize()
     checkDefaultDB.value = dbObjRangeUseAsDefaultDB
     
     bInitializing = False
-    'Initialize Table locking ranges
-    'lockRangeTableName = FormCommon.initializeRange("LockTableName")
-    'Set lockRangeTableDate = FormCommon.initializeRange("LockTableDate")
-
+    
     sheetCode = ActiveSheet.CodeName
+    ' need to check because if this Excel option: "Trust access to the VBA-Project Object model"  is not checked then CodeName will equal "".
+    If sheetCode = "" Then
+        sheetCode = ActiveSheet.name
+    End If
+     
     '********* Saved SQL Ranges **************
     sqlRangeName_Name = sgSavedSQL_Name_RangePrefix & sheetCode
     sqlRangeSQL_Name = sgSavedSQL_SQL_RangePrefix & sheetCode

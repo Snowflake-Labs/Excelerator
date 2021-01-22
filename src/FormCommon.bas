@@ -29,16 +29,6 @@ End Sub
 
 Sub initializeDBObjectsComboBoxes(ByRef cbDatabases As comboBox, ByRef cbSchemas As comboBox, ByRef cbTables As comboBox)
     bInitializing = True
-    'Get the CodeName for the worksheet - Need to do this craziness because the codename is not available when not in the debugger until you execute the below lines
-    'Also I have to trap for errors because if someone renames the sheet before running a query it will through an error, but the codeName will then be available.
-    sheetCode = ActiveSheet.CodeName
-    If sheetCode = "" Then
-        On Error Resume Next
-        sheetCode = ActiveWorkbook.VBProject.VBComponents(ActiveSheet.name).Properties("Codename")
-        sheetCode = ActiveSheet.CodeName
-        On Error GoTo 0
-    End If
-
     'Get the worksheet that holds the params
     Set wsWorkbookParams = Utils.getWorksheet(gsSnowflakeWorkbookParamWorksheetName)
 
