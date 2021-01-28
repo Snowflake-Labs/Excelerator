@@ -102,7 +102,12 @@ Sub uploadData(copyType As String, inTableName As String, inMergeKeys As String)
             truncateTable
             copyDataLocal (copyType)
         Case copyType = "RecreateLocal" Or copyType = "CreateLocal"
-            If copyType = "CreateLocal" Then On Error GoTo ErrorHandlerSimpleUpdateNoRollback
+            If copyType = "CreateLocal" Then
+                On Error GoTo ErrorHandlerSimpleUpdateNoRollback
+            Else
+                'Create clone table
+                clonedTable = createClone(tableName)
+            End If
             createTableLocal
             copyDataLocal (copyType)
             Call FormCommon.dropDBObjectsTableCache
@@ -618,8 +623,7 @@ Sub createTableLocal()
         err.Raise giSuppressErrorMessage
     End If
     On Error GoTo ErrorHandlerCreateTable
-    'Create clone table
-    clonedTable = createClone(tableName)
+
 
     numberOfColumns = dataWorksheet.UsedRange.columns.Count
     For i = 1 To numberOfColumns
@@ -630,7 +634,7 @@ Sub createTableLocal()
                 MsgBox ("Error: Data type for " & colName & " is not defined. Please set a data type for all columns")
                 err.Raise giSuppressErrorMessage
             End If
-            colDefinition = colDefinition & "," & colName & " " & datatype
+            colDefinition = colDefinition & ",""" & colName & """ " & datatype
         End If
     Next i
     'remove leading chars
