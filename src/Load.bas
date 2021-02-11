@@ -80,6 +80,8 @@ Sub uploadData(copyType As String, inTableName As String, inMergeKeys As String)
     tableName = inTableName  ' this is the fully qualified table name
     fileName = UCase(tableName & "TEMP.CSV")
     fileName = Replace(fileName, Chr(34), vbNullString, 1, 6)
+    fileName = Replace(fileName, "/", "..")
+    fileName = Replace(fileName, "\", "..")
     windowsTempDirectory = CustomRange(sgRangeWindowsTempDirectory)
 
     'authType = CustomRange(sgRangeAuthType)
@@ -714,14 +716,12 @@ End Function
 Function createClonedTableName(origTable As String)
     'the table will be fully qualified with quotes so we need to get rid of the quotes then just take the table
     Dim tempTable As String
-    'Remove the quotes
-    tempTable = Replace(origTable, Chr(34), vbNullString, 1, 6)
-   'Removed this becuase there is not more default database, so we need to keep the fully qualified table name
-   ' Dim tableArr() As String
-   ' tableArr = Split(tempTable, ".")
-   ' tempTable = tableArr(UBound(tableArr))
-
-    createClonedTableName = tempTable & (Int(1 + Rnd * (1000)) * Second(Now())) & "_BackupForExcel"
+    'Don't remove the quotes anymore because of special characters in the DB, schema or tablename
+    'tempTable = Replace(origTable, Chr(34), vbNullString, 1, 6)
+   
+    'Remove the last character because it's a quote. We add it back in the next line.
+    tempTable = Left(origTable, Len(tableName) - 1)
+    createClonedTableName = tempTable & (Int(1 + Rnd * (1000)) * Second(Now())) & "_BackupForExcel" & """"
 
 End Function
 Sub rollback(origTable As String, clonedTable As String)
@@ -880,7 +880,7 @@ Function checkIfTableHasBeenAltered(compareDate As String, fullyQualifiedTable A
         checkIfTableHasBeenAltered = "False"
         Exit Function
     End If
-    fullyQualifiedTable = Replace(fullyQualifiedTable, Chr(34), vbNullString, 1, 6)
+    'fullyQualifiedTable = Replace(fullyQualifiedTable, Chr(34), vbNullString, 1, 6)
     arr = Split(fullyQualifiedTable, ".")
     Db = arr(0)
     schema = arr(1)

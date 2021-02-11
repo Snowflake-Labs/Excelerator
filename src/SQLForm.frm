@@ -337,7 +337,7 @@ Public Sub ExecuteButton_Click()
 
     Set StatusForm = Nothing
     If checkDefaultDB Then
-        Utils.execSQLFireAndForget ("use schema " & cbDatabases & "." & cbSchemas)
+        Utils.execSQLFireAndForget ("use schema """ & cbDatabases & """.""" & cbSchemas & """")
     End If
     
     Call StatusForm.execMethod("Query", "ExecuteSQLFromNamedCell", tbSQL)
