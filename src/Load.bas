@@ -95,6 +95,9 @@ Sub uploadData(copyType As String, inTableName As String, inMergeKeys As String)
     saveAndUploadFile
 
     On Error GoTo ErrorHandlerSimpleUpdate
+    If copyType <> "CreateLocal" Then
+        clonedTable = createClone(tableName)
+    End If
     Select Case True
         Case copyType = "MergeLocal" Or copyType = "AppendLocal"
             addColumns
@@ -105,17 +108,13 @@ Sub uploadData(copyType As String, inTableName As String, inMergeKeys As String)
             copyDataLocal (copyType)
         Case copyType = "RecreateLocal" Or copyType = "CreateLocal"
             If copyType = "CreateLocal" Then
-                On Error GoTo ErrorHandlerSimpleUpdateNoRollback
-            Else
-                'Create clone table
-                clonedTable = createClone(tableName)
+               ' On Error GoTo ErrorHandlerSimpleUpdateNoRollback
             End If
             createTableLocal
             copyDataLocal (copyType)
             Call FormCommon.dropDBObjectsTableCache
         Case Else
             On Error GoTo ErrorHandleruploadNeedsStoredProcs
-            clonedTable = createClone(tableName)
             uploadNeedsStoredProcs (copyType)
             If copyType = "RecreateTable" Then
                 Call FormCommon.dropDBObjectsTableCache
@@ -157,10 +156,9 @@ ErrorHandlerSimpleUpdate:
         Call Utils.handleError("Error:", err)
     End If
     'this needs to come after the err.Number check beacuse it resets the err number
-    Call rollback(tableName, clonedTable)
-    Exit Sub
-ErrorHandlerSimpleUpdateNoRollback:
-    StatusForm.Hide
+    If copyType <> "CreateLocal" Then
+        Call rollback(tableName, clonedTable)
+    End If
     Exit Sub
 ErrorHandleruploadNeedsStoredProcs:
     If err.Number = giSuppressErrorMessage Then
@@ -610,7 +608,6 @@ Public Function IsInArray(stringToBeFound As Variant, arr As Variant) As Boolean
 End Function
 
 Sub truncateTable()
-    clonedTable = createClone(tableName)
     Call Utils.execSQLFireAndForget("truncate table " & tableName)
 End Sub
 
@@ -664,9 +661,6 @@ Sub addColumns()
     If iHeaderRow = 1 Then
         Exit Sub
     End If
-
-    'Create clone table
-    clonedTable = createClone(tableName)
 
     On Error GoTo ErrorHandlerAddColumns
     numberOfColumns = dataWorksheet.UsedRange.columns.Count
@@ -730,6 +724,8 @@ Sub rollback(origTable As String, clonedTable As String)
     If clonedTable <> "" Then
         swapSQL = "alter table " & origTable & " swap with " & clonedTable
         Utils.execSQLFireAndForget (swapSQL)
+        dropCloneSQL = "drop table " & clonedTable
+        Utils.execSQLFireAndForget (dropCloneSQL)
     End If
     Exit Sub
 ErrorHandlerSQL:
