@@ -22,6 +22,7 @@ Sub ExecuteSQL(sqlString As String)
 
         Call Utils.RemoveQueryTables(queryResultWorksheet)
         
+        sqlString = TrimTrailing(sqlString)
         'remove last char if it's a ;
         If (Right(sqlString, 1) = ";") Then
             sqlString = Left(sqlString, Len(sqlString) - 1)
@@ -31,21 +32,23 @@ Sub ExecuteSQL(sqlString As String)
         Dim arrQueries() As String
         arrQueries = Split(sqlString, ";")
         For i = LBound(arrQueries) To UBound(arrQueries) - 1
+            arrQueries(i) = TrimTrailing(arrQueries(i))
             If arrQueries(i) <> "" Then
                 StatusForm.Update_Status ("Executing query #" & i + 1 & "...")
                 Utils.execSQLFireAndForget (arrQueries(i))
             End If
         Next i
-        sqlString = arrQueries(i)
-        
-        StatusForm.Update_Status ("Executing query...")
-        
-        Call Utils.ExecSQL(queryResultWorksheet, gsQueryResultsCell, sqlString)
-        ' set download datetime
-        Call Query.setDownloadDateTime
-        'On Error GoTo ErrorHandlerCreateExcelTable
-        StatusForm.Update_Status ("Creating Excel table...")
+        sqlString = TrimTrailing(arrQueries(i))
+        If sqlString <> "" Then
+            StatusForm.Update_Status ("Executing query...")
+            
+            Call Utils.ExecSQL(queryResultWorksheet, gsQueryResultsCell, sqlString)
+            ' set download datetime
+            Call Query.setDownloadDateTime
+            'On Error GoTo ErrorHandlerCreateExcelTable
+            StatusForm.Update_Status ("Creating Excel table...")
         Call Utils.createTableForAllDataOnWorksheet(queryResultWorksheet)
+        End If
         StatusForm.Hide
         RibbonactivateHomeTab
     End If
@@ -61,6 +64,22 @@ ErrorHandlerCreateExcelTable:
     Call Utils.handleError("Error trying to format final table on worksheet. ", err)
     Exit Sub
 End Sub
+Function TrimTrailing(str1 As Variant) As String
+
+Dim i As Integer
+TrimTrailing = str1
+For i = Len(str1) To 1 Step -1
+    If Application.Clean(Trim(Mid(str1, i, 1))) = "" Then
+        'skip
+    Else 'stop at first non-empty character
+        TrimTrailing = Mid(str1, 1, i)
+        Exit For
+    End If
+Next i
+If i = 0 Then 'if it hits the end
+    TrimTrailing = ""
+End If
+End Function
 
 Sub ExecuteSQLFromNamedCell(sql As String)
     ExecuteSQL (sql)
