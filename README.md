@@ -14,7 +14,7 @@ Example use-cases include:
 |---------------|:------------------------|
 
 ## Get Started with Excelerator
-Important: When following the instructions below, make sure to 'Unblock' the Addin after downloading. The details are in the link located in Step 3 below.
+Important: When following the instructions below, make sure to 'Unblock' the Addin after downloading. The details are in the link located in Step 2 below.
 
 To get started, you'll need to:
 
