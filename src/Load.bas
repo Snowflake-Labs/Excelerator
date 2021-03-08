@@ -159,7 +159,7 @@ ErrorHandlerSimpleUpdate:
     If copyType <> "CreateLocal" Then
         Call rollback(tableName, clonedTable)
     End If
-    Exit Sub
+    GoTo Cleanup
 ErrorHandleruploadNeedsStoredProcs:
     If err.Number = giSuppressErrorMessage Then
         StatusForm.Hide
@@ -385,6 +385,11 @@ Function fullFileName(fileName As String, windowsDirectory As String) As fileNam
     dirExists2 = vba.FileSystem.Dir(snowflakeDirectory, vbDirectory)
     If dirExists2 = vba.Constants.vbNullString Then
         MkDir snowflakeDirectory
+    Else
+        ' Delete contents of directory
+        On Error Resume Next
+        Kill snowflakeDirectory & "\*.csv"
+        On Error GoTo 0
     End If
     'FullFileName = directory & "/" & fileName
     fullFileName.save = snowflakeDirectory & "\" & fileName
