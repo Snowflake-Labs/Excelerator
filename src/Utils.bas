@@ -24,10 +24,15 @@ Function ConnectionStringDSNLess()
     connectionType = "Provider=MSDASQL.1;"
     #End If
     Dim dateInputFormat As String
-
+    Dim sRole As String
+    sRole = CustomRange(sgRangeRole)
+    If sRole = "ALL" Then
+        sRole = ""
+    End If
+    
     ConnectionStringDSNLess = connectionType & "driver={SnowflakeDSIIDriver};server=" & LoginForm.tbServer & ";database=" & _
        CustomRange(sgRangeDefaultDatabase) & ";schema=" & CustomRange(sgRangeDefaultSchema) & ";warehouse=" & CustomRange(sgRangeWarehouse) & ";role=" & _
-       CustomRange(sgRangeRole) & ";Uid=" & LoginForm.tbUserID & ";"
+       sRole & ";Uid=" & LoginForm.tbUserID & ";"
 
     If LoginForm.rbSSO Then
         ConnectionStringDSNLess = ConnectionStringDSNLess & "Authenticator=externalbrowser;"
