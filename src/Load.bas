@@ -18,6 +18,7 @@ Dim iHeaderRow As Integer
 Dim clonedTable As String
 Dim stageName As String
 Dim sqlFileFormatSkipHeader As String
+Dim tempObjectSchema As String
 
 Sub OpenUploadDataForm()
     Set UploadDataForm = Nothing
@@ -46,7 +47,10 @@ Sub uploadData(copyType As String, inTableName As String, inMergeKeys As String)
 
     'reseting the clonedTable
     clonedTable = ""
-
+    
+    'Get the stage for temporary objects. This is needed if there is a 'future' grant on the current stage and the cloned table can't be deleted
+    tempObjectSchema = CustomRange(sgRangeTempSchema)
+    
     '************ Gets the Worksheets and create them if needed ***********
     On Error GoTo ErrorHandlerUploadWorksheetDoesNotExist
     ' DATA - remove all empty rows in data worksheet
@@ -201,6 +205,10 @@ Function createStage(ByRef stageName As String)
         'This creates the stage in the same database as the table since the table is fully qualified
         'Have to remove the last character from the table name since its a quote ", Then add is back at the end of the stageName
         stageName = Left(tableName, Len(tableName) - 1) & "ExcelStage_" & randomNumber & """"
+        If tempObjectSchema <> "" Then
+            stageName = Replace(stageName, ".", "")
+            stageName = tempObjectSchema & "." & stageName
+        End If
         sqlString = "create or replace stage " & stageName & " file_format = (type=csv, SKIP_HEADER=0,FIELD_OPTIONALLY_ENCLOSED_BY = '""')"
         Call Utils.execSQLFireAndForget(sqlString)
         createStage = True
@@ -715,11 +723,17 @@ End Function
 Function createClonedTableName(origTable As String)
     'the table will be fully qualified with quotes so we need to get rid of the quotes then just take the table
     Dim tempTable As String
+    Dim partArray() As String
     'Don't remove the quotes anymore because of special characters in the DB, schema or tablename
     'tempTable = Replace(origTable, Chr(34), vbNullString, 1, 6)
    
     'Remove the last character because it's a quote. We add it back in the next line.
     tempTable = Left(origTable, Len(tableName) - 1)
+    If tempObjectSchema <> "" Then
+        partArray = Split(tempTable, ".")
+        tempTable = partArray(UBound(partArray, 1))
+        tempTable = tempObjectSchema & "." & tempTable
+    End If
     createClonedTableName = tempTable & (Int(1 + Rnd * (1000)) * Second(Now())) & "_BackupForExcel" & """"
 
 End Function

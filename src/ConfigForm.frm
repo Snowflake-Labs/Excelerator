@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} ConfigForm 
    Caption         =   "Configuration"
-   ClientHeight    =   7335
+   ClientHeight    =   8100
    ClientLeft      =   120
    ClientTop       =   465
-   ClientWidth     =   6405
+   ClientWidth     =   6375
    OleObjectBlob   =   "ConfigForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -36,6 +36,8 @@ Private Sub ChangeRoleAndWarehouse()
     tbUserWarehouse = Utils.CustomRange(sgRangeWarehouse)
 '    StatusForm.Hide
 End Sub
+
+
 
 Private Sub lblUserRole_Click()
     ChangeRoleAndWarehouse
