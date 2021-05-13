@@ -2,9 +2,9 @@ VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} UploadDataForm 
    Caption         =   "Upload Data"
    ClientHeight    =   6870
-   ClientLeft      =   120
-   ClientTop       =   465
-   ClientWidth     =   5850
+   ClientLeft      =   119
+   ClientTop       =   462
+   ClientWidth     =   5852
    OleObjectBlob   =   "UploadDataForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End

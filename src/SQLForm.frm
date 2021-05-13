@@ -2,9 +2,9 @@ VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} SQLForm 
    Caption         =   "Execute SQL"
    ClientHeight    =   8580
-   ClientLeft      =   60
+   ClientLeft      =   63
    ClientTop       =   210
-   ClientWidth     =   9990
+   ClientWidth     =   9989
    OleObjectBlob   =   "SQLForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End

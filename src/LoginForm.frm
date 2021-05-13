@@ -1,10 +1,10 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} LoginForm 
    Caption         =   "Connection"
-   ClientHeight    =   3630
-   ClientLeft      =   120
-   ClientTop       =   465
-   ClientWidth     =   6180
+   ClientHeight    =   5012
+   ClientLeft      =   238
+   ClientTop       =   931
+   ClientWidth     =   6286
    OleObjectBlob   =   "LoginForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End
@@ -28,6 +28,12 @@ Dim temp_tbPassword As String
 Dim sExampleServerURL As String
 ' Was the OK or cancel button pressed
 Public bLoginOK As Boolean
+
+
+
+Private Sub Frame1_Click()
+
+End Sub
 
 Private Sub rbSSO_Click()
     gsAuthenticationType = "SSO"
