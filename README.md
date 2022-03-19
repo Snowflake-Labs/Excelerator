@@ -2,7 +2,7 @@
 
 Excelerator is an Excel Add-In to help you pull data from Snowflake into Excel and push new or updated data from Excel into Snowflake.
 Excelerator is only compatible with the Windows operating system, not the MacOS.
-View a demo of Excelerator: https://youtu.be/csmS5V2ONr8
+View a [demo of Excelerator](https://youtu.be/csmS5V2ONr8) and see it [upload over 1 million rows (77MB)](https://www.youtube.com/watch?v=MLDnWLd1EHA). 
 
 Example use-cases include:
 * financial budgeting write-back,
