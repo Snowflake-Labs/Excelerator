@@ -2,9 +2,9 @@ VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} LoginForm 
    Caption         =   "Connection"
    ClientHeight    =   5012
-   ClientLeft      =   238
-   ClientTop       =   931
-   ClientWidth     =   6286
+   ClientLeft      =   240
+   ClientTop       =   930
+   ClientWidth     =   6285
    OleObjectBlob   =   "LoginForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End

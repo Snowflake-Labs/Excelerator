@@ -1,7 +1,8 @@
 Attribute VB_Name = "Utils"
 Dim msConnectionStatus As String
 Dim msRibbon As IRibbonUI
-Dim mdConnections As New Scripting.Dictionary
+'Dim mdConnections As New Scripting.Dictionary
+Dim mDBConnection As ADODB.Connection
 Dim bSecondPass As Boolean ' used to allow execution of sql inside the open connection sub without infinite recursion
 
 
@@ -91,7 +92,7 @@ ErrorHandlerConnection:
 End Sub
 Function openLogin()
     Dim connString As String
-    Dim mDBConnection As ADODB.Connection
+    'Dim mDBConnection As ADODB.Connection
     Dim bConnected As Boolean
     Dim bEverythingOKWithConncetion As Boolean
     Dim arrDBObjs() As String
@@ -114,10 +115,11 @@ Function openLogin()
                 End If
             End If
         Loop
-        If mdConnections.Exists(ActiveWorkbook.name) Then
-            mdConnections.Remove (ActiveWorkbook.name)
-        End If
-        mdConnections.Add key:=ActiveWorkbook.name, Item:=mDBConnection
+        '###
+        'If mdConnections.Exists(ActiveWorkbook.name) Then
+        '    mdConnections.Remove (ActiveWorkbook.name)
+        'End If
+        'mdConnections.Add key:=ActiveWorkbook.name, Item:=mDBConnection
         If Not bSecondPass Then ' this is to make sure there is no infinite recursion
             bSecondPass = True
             Call Utils.SetSessionParameters
@@ -135,14 +137,16 @@ ErrorHandlerConnection:
 End Function
 
 Public Function getOpenDBConncetion(reauthenticate As Boolean)
-    Dim mDBConnection As ADODB.Connection
+    'Dim mDBConnection As ADODB.Connection
     Dim bGetConnection As Boolean
     ' This collection of connections is to handle multiple excel workbooks being open at one time.
-    If Not mdConnections.Exists(ActiveWorkbook.name) Or reauthenticate Then
+    '#####
+    'If Not mdConnections.Exists(ActiveWorkbook.name) Or reauthenticate Then
+    If mDBConnection Is Nothing Or reauthenticate Then
         On Error GoTo ErrorHandlerConnection
         Set mDBConnection = openLogin
-    Else
-        Set mDBConnection = mdConnections(ActiveWorkbook.name)
+    'Else
+    '    Set mDBConnection = mdConnections(ActiveWorkbook.name)
     End If
 
     If mDBConnection.State = 0 Then

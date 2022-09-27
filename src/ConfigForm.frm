@@ -2,9 +2,9 @@ VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} ConfigForm 
    Caption         =   "Configuration"
    ClientHeight    =   8100
-   ClientLeft      =   119
-   ClientTop       =   462
-   ClientWidth     =   6377
+   ClientLeft      =   120
+   ClientTop       =   465
+   ClientWidth     =   6375
    OleObjectBlob   =   "ConfigForm.frx":0000
    StartUpPosition =   1  'CenterOwner
 End

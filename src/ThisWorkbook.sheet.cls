@@ -4,7 +4,7 @@ Private Sub Workbook_AddinInstall()
     Call Utils.CopySnowflakeConfgWS
 End Sub
 
-Private Sub Workbook_Open()
+Sub Workbook_Open()
     Debug.Print "Snowflake thisWorkbook_Open()"
     Set app = Excel.Application
     'Only add ribbon buttons when this is not run as an Addin. These buttons are for Dev only 12

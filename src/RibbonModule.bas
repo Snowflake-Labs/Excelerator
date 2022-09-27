@@ -9,6 +9,7 @@ End Sub
 
 Sub EnableControl(control As IRibbonControl, ByRef returnedVal)
     'Returns trueif not in read only mode
+    
     returnedVal = True
     If isAddinReadOnly Then
         If control.Tag = "ReadWrite" Then

@@ -225,7 +225,9 @@ Sub getDatabasesCombobox(ByRef cbDatabases As comboBox)
     If IsEmpty(arrDatabases) Then
         sql = "show databases"
         Utils.execSQLFireAndForget (sql)
-        sql = "WITH databases (a,name,b,c,d,e,f,g,h) as (select * from table(result_scan(last_query_id()))) " & _
+       ' sql = "WITH databases (a,name,b,c,d,e,f,g,h) as (select * from table(result_scan(last_query_id()))) " & _
+                "select name from databases"
+        sql = "WITH databases (name) as (select ""name"" from table(result_scan(last_query_id()))) " & _
                 "select name from databases"
         arrDatabases = Utils.execSQLToArray(sql)
     End If
