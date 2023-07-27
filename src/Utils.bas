@@ -34,7 +34,12 @@ Function ConnectionStringDSNLess()
     ConnectionStringDSNLess = connectionType & "driver={SnowflakeDSIIDriver};server=" & LoginForm.tbServer & ";database=" & _
        CustomRange(sgRangeDefaultDatabase) & ";schema=" & CustomRange(sgRangeDefaultSchema) & ";warehouse=" & CustomRange(sgRangeWarehouse) & ";role=" & _
        sRole & ";Uid=" & LoginForm.tbUserID & ";"
+    
 
+    'ConnectionStringDSNLess = "ODBC;DSN=Demo165" & ";database=" & _
+       CustomRange(sgRangeDefaultDatabase) & ";schema=" & CustomRange(sgRangeDefaultSchema) & ";warehouse=" & CustomRange(sgRangeWarehouse) & ";role=" & _
+       sRole & ";Uid=" & LoginForm.tbUserID & ";"
+       
     If LoginForm.rbSSO Then
         ConnectionStringDSNLess = ConnectionStringDSNLess & "Authenticator=externalbrowser;"
     Else

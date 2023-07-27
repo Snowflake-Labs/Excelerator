@@ -766,7 +766,7 @@ Function grantAllPrivsToClonedTableSQL(origTable As String, clonedTable As Strin
 
     Call Utils.execSQLFireAndForget("show grants on " & origTable)
     sql = "with ShowGrants (created_on,privilege,granted_on,name,granted_to,grantee_name,grant_option,granted_by) as " & _
-    "(select * from  table(result_scan(last_query_id()))) " & _
+    "(select ""created_on"",""privilege"",""granted_on"",""name"",""granted_to"",""grantee_name"",""grant_option"",""granted_by"" from  table(result_scan(last_query_id()))) " & _
     "select 'grant '|| privilege|| ' on table ' || '" & clonedTable & "' || ' to '|| granted_to ||' ' || grantee_name || " & _
     "IFF( grant_option='true' , ' with grant option' ,'' ) " & _
     "from ShowGrants where privilege <>'OWNERSHIP' order by created_on desc"

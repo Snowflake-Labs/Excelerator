@@ -252,7 +252,7 @@ Public Sub uploadData(sUploadType As String)
         'check if the table has been updated since the last time it was downloaded
         If checkIfTableHasBeenAltered = True Then
             If MsgBox("The table has been updated since the last data download time." & _
-            vbNewLine & "Continue uplading?", vbOKCancel, "Update Conflict") = vbCancel Then
+            vbNewLine & "Continue uploading?", vbOKCancel, "Update Conflict") = vbCancel Then
                 UploadDataForm.Hide
                 Set UploadDataForm = Nothing
                 Exit Sub
